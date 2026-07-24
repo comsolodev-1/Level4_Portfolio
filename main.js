@@ -1,0 +1,840 @@
+/* ═══════════════════════════════════════════════════════════════
+   PORTFOLIO — main.js
+   ───────────────────────────────────────────────────────────────
+   Responsibilities:
+     1. EmailJS init + dual-send (notify YOU + auto-reply to visitor)
+     2. Mobile nav hamburger toggle + X animation
+     3. Scroll-triggered fade-in animations (IntersectionObserver)
+     4. Active nav link highlighting as user scrolls
+     5. Dark/light theme toggle (persisted in localStorage)          [Level 3]
+     6. Project filter pills (filters .project-card by data-category) [Level 3]
+     7. Custom cursor label that follows the mouse over project cards [Level 3]
+     8. Command palette (Cmd/Ctrl+K quick navigation)                [Level 4]
+     9. Case study modal (per-project Problem/Process/Result)        [Level 4]
+    10. Live GitHub stats (public REST API, no auth token)           [Level 4]
+    11. Hero mouse-parallax                                          [Level 4]
+   ───────────────────────────────────────────────────────────────
+   Dependencies:
+     • EmailJS Browser SDK v4 — loaded in index.html <head>
+       https://www.emailjs.com/docs/sdk/installation/
+   ═══════════════════════════════════════════════════════════════ */
+
+
+/* ───────────────────────────────────────────────────────────────
+   EMAILJS CONFIGURATION
+   ───────────────────────────────────────────────────────────────
+   How to set up (one-time, takes ~5 minutes):
+
+   STEP 1 — Get your Public Key:
+     emailjs.com → Account → API Keys → copy "Public Key"
+
+   STEP 2 — Create an Email Service:
+     emailjs.com → Email Services → Add New Service → connect Gmail/Outlook
+     Copy the Service ID (looks like: service_xxxxxxx)
+
+   STEP 3 — Create Template 1 "Notification" (sent TO YOU when someone fills form):
+     emailjs.com → Email Templates → Create New
+     To email:  your own email address
+     Reply To:  {{reply_to}}      ← lets you hit Reply directly to the visitor
+     Subject:   New message from {{from_name}}: {{subject}}
+     Body:      Use {{from_name}}, {{reply_to}}, {{subject}}, {{message}}
+     Save → copy Template ID
+
+   STEP 4 — Create Template 2 "Auto-reply" (sent TO THE VISITOR automatically):
+     emailjs.com → Email Templates → Create New
+     To email:  {{reply_to}}      ← THIS is what sends it to the visitor's inbox
+     From name: Your Name
+     Subject:   Thank you for reaching out, {{from_name}} 👋
+     Body:      Paste the HTML from autoreply-template.html
+     Save → copy Template ID
+
+   STEP 5 — Fill in the four constants below.
+
+   ⚠️  TYPO CHECK: Template IDs start with "template_" (no extra/missing letters).
+       Double-check yours before deploying. Example: 'template_abc123'
+   ─────────────────────────────────────────────────────────────── */
+const EMAILJS_PUBLIC_KEY      = 'cqJpoADP-jLCMbNar';       // Account → API Keys
+const EMAILJS_SERVICE_ID      = 'service_14ae3x5';       // Email Services → your service
+const EMAILJS_NOTIFY_TEMPLATE = 'template_5ezztvb';  // Template 1 → sends to YOU
+const EMAILJS_REPLY_TEMPLATE  = 'template_gz347wb';   // Template 2 → sends to VISITOR
+
+
+/* ───────────────────────────────────────────────────────────────
+   INIT — Entry point
+   ───────────────────────────────────────────────────────────────
+   DOMContentLoaded fires when the HTML is fully parsed but before
+   images/fonts finish loading — perfect for attaching event listeners.
+   We initialize EmailJS here so it's ready before the form is submitted.
+   ─────────────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Initialize EmailJS with our public key.s
+  // Must be called once before any emailjs.send() calls.
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+  // Boot all features
+  initNav();
+  initScrollAnimations();
+  initActiveNavLinks();
+  initContactForm();
+  initThemeToggle();
+  initProjectFilters();
+  initCustomCursor();
+  initCommandPalette();
+  initCaseStudyModal();
+  initGithubStats();
+  initHeroParallax();
+
+});
+
+
+/* ───────────────────────────────────────────────────────────────
+   MOBILE NAV TOGGLE
+   ───────────────────────────────────────────────────────────────
+   On screens ≤ 768px (CSS breakpoint), the nav links are hidden
+   and a hamburger button is shown instead. Clicking the hamburger:
+     • Toggles the .open class on the <ul> (CSS shows/hides it)
+     • Updates aria-expanded for screen reader announcements
+     • Animates the 3 bars → X using inline transforms
+
+   Clicking any nav link also closes the menu (good UX on mobile
+   since single-page scrolling doesn't trigger a page reload).
+   ─────────────────────────────────────────────────────────────── */
+function initNav() {
+  const hamburger = document.getElementById('hamburger');
+  const navLinks  = document.getElementById('navLinks');
+
+  // Guard: if elements don't exist (e.g. template partial), exit silently
+  if (!hamburger || !navLinks) return;
+
+  /* ── Hamburger click: open/close ── */
+  hamburger.addEventListener('click', () => {
+    const isOpen = navLinks.classList.toggle('open');
+
+    // Sync aria-expanded so screen readers announce "expanded" / "collapsed"
+    hamburger.setAttribute('aria-expanded', String(isOpen));
+
+    // Animate bars to X shape (or back to 3 bars)
+    const bars = hamburger.querySelectorAll('span');
+    if (isOpen) {
+      // Top bar    → rotates 45° downward
+      bars[0].style.transform = 'translateY(6.5px) rotate(45deg)';
+      // Middle bar → fades out (hidden in the X)
+      bars[1].style.opacity   = '0';
+      // Bottom bar → rotates -45° upward
+      bars[2].style.transform = 'translateY(-6.5px) rotate(-45deg)';
+    } else {
+      // Reset all bars back to default state
+      bars[0].style.transform = '';
+      bars[1].style.opacity   = '';
+      bars[2].style.transform = '';
+    }
+  });
+
+  /* ── Close menu when any nav link is clicked ── */
+  // Needed because smooth-scroll doesn't reload the page, so the menu
+  // would stay open after tapping a link without this handler.
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+
+      // Reset hamburger bars back to 3-line state
+      const bars = hamburger.querySelectorAll('span');
+      bars[0].style.transform = '';
+      bars[1].style.opacity   = '';
+      bars[2].style.transform = '';
+    });
+  });
+}
+
+
+/* ───────────────────────────────────────────────────────────────
+   SCROLL FADE-IN ANIMATIONS
+   ───────────────────────────────────────────────────────────────
+   Uses the IntersectionObserver API — a performant native browser
+   API that fires a callback when an element enters/exits the viewport.
+   Much better than scroll event listeners (no main-thread blocking).
+
+   How it works:
+     • Elements with class .fade-in start invisible (opacity:0, translateY)
+       defined in style.css
+     • When 10% of the element enters the viewport, we add .visible
+       which CSS transitions to opacity:1 + translateY(0)
+     • observer.unobserve() stops watching the element after it animates —
+       no point tracking it further once it's visible
+
+   threshold: 0.1 means "trigger when 10% of the element is visible"
+   ─────────────────────────────────────────────────────────────── */
+function initScrollAnimations() {
+  const targets = document.querySelectorAll('.fade-in');
+
+  // Exit early if no animated elements exist on the page
+  if (!targets.length) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Add .visible → triggers the CSS transition
+          entry.target.classList.add('visible');
+          // Stop observing — element is visible and won't need to animate again
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1 } // Fire when 10% of the element is in viewport
+  );
+
+  // Attach observer to every .fade-in element
+  targets.forEach(el => observer.observe(el));
+}
+
+
+/* ───────────────────────────────────────────────────────────────
+   ACTIVE NAV LINK HIGHLIGHTING
+   ───────────────────────────────────────────────────────────────
+   As the user scrolls, the corresponding nav link for the section
+   currently in view gets the .active CSS class (which makes it darker).
+
+   How it works:
+     • On every scroll event, we check scrollY + 100px offset against
+       each section's offsetTop and offsetTop + offsetHeight range.
+     • The 100px offset accounts for the fixed nav height (64px) plus
+       a small buffer so the link activates slightly before the section
+       reaches the very top of the viewport — feels more natural.
+     • { passive: true } tells the browser this listener will never call
+       preventDefault(), allowing scroll performance optimizations.
+   ─────────────────────────────────────────────────────────────── */
+function initActiveNavLinks() {
+  // All sections that have an id (hero, skills, experience, projects, contact)
+  const sections   = document.querySelectorAll('section[id]');
+  // All nav links that point to page anchors (href="#...")
+  const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
+
+  const setActive = () => {
+    // Add 100px offset: nav height (64px) + small buffer (36px)
+    const scrollPos = window.scrollY + 100;
+
+    sections.forEach(section => {
+      // Find the matching nav link for this section by its id
+      const link = document.querySelector(`.nav-links a[href="#${section.id}"]`);
+      if (!link) return; // No nav link for this section (e.g. #hero has no nav item)
+
+      // Check if current scroll position is within this section's vertical range
+      const isInView = scrollPos >= section.offsetTop &&
+                       scrollPos <  section.offsetTop + section.offsetHeight;
+
+      if (isInView) {
+        // Remove .active from all links first, then add to current
+        navAnchors.forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  };
+
+  // Listen to scroll — passive for performance (no preventDefault needed)
+  window.addEventListener('scroll', setActive, { passive: true });
+
+  // Run once on page load to set the correct active link immediately
+  setActive();
+}
+
+
+/* ───────────────────────────────────────────────────────────────
+   EMAILJS CONTACT FORM
+   ───────────────────────────────────────────────────────────────
+   On valid submit, fires TWO emails in parallel using Promise.all():
+
+     Email 1 — NOTIFY_TEMPLATE → to YOU
+       Purpose: you receive the visitor's message in your inbox
+       "Reply To" is set to the visitor's email in the template,
+       so hitting Reply automatically addresses the visitor.
+
+     Email 2 — REPLY_TEMPLATE → to THE VISITOR
+       Purpose: visitor gets an instant confirmation with your
+       response timeline, contact alternatives, and a recap
+       of what they sent. See autoreply-template.html.
+
+   Promise.all() sends both simultaneously — visitor waits for
+   only one round-trip of latency, not two sequential ones.
+
+   Error handling:
+     • If EITHER email fails, the whole Promise.all rejects and
+       the user sees an error message. Both succeed or we report failure.
+
+   UX states managed:
+     • setLoading(true)  → disables button + changes text to "Sending…"
+     • showStatus(type)  → shows success (green) or error (red) pill
+     • clearStatus()     → hides the status pill
+     • form.reset()      → clears all fields after success
+   ─────────────────────────────────────────────────────────────── */
+function initContactForm() {
+  // Cache all form-related DOM references
+  const form       = document.getElementById('contactForm');
+  const submitBtn  = document.getElementById('submitBtn');
+  const btnText    = document.getElementById('btnText');
+  const btnIcon    = document.getElementById('btnIcon');
+  const formStatus = document.getElementById('formStatus');
+
+  // Exit if form not found (defensive: in case HTML changes)
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    // Prevent default browser form submission (would reload the page)
+    e.preventDefault();
+
+    // Extract and trim all field values
+    const name    = form.from_name.value.trim();
+    const email   = form.reply_to.value.trim();
+    const subject = form.subject.value.trim();
+    const message = form.message.value.trim();
+
+    /* ── Client-side validation ── */
+    // Check for empty fields first
+    if (!name || !email || !subject || !message) {
+      showStatus('error', 'Please fill in all fields.');
+      return; // Stop here — don't attempt to send
+    }
+
+    // Validate email format with regex
+    if (!isValidEmail(email)) {
+      showStatus('error', 'Please enter a valid email address.');
+      return;
+    }
+
+    /* ── Start loading state ── */
+    setLoading(true);
+    clearStatus(); // Clear any previous status message
+
+    // Build the data object that maps to EmailJS template variables:
+    //   {{from_name}} → visitor's name
+    //   {{reply_to}}  → visitor's email (used as "To" in auto-reply template)
+    //   {{subject}}   → form subject field
+    //   {{message}}   → form message field
+    const templateParams = {
+      from_name: name,
+      reply_to:  email,
+      subject:   subject,
+      message:   message,
+    };
+
+    try {
+      // Fire both emails at the same time — parallel, not sequential
+      await Promise.all([
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_NOTIFY_TEMPLATE, templateParams), // → you
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_REPLY_TEMPLATE,  templateParams), // → visitor
+      ]);
+
+      // Both succeeded
+      showStatus('success', "Message sent! Check your inbox for a confirmation.");
+      form.reset(); // Clear the form fields
+
+    } catch (err) {
+      // Log to console for debugging; show user-friendly message on page
+      console.error('EmailJS send error:', err);
+      showStatus('error', 'Something went wrong. Try reaching me directly.');
+
+    } finally {
+      // Always restore the button, whether success or failure
+      setLoading(false);
+    }
+  });
+
+
+  /* ── Helper: toggle button loading state ── */
+  function setLoading(isLoading) {
+    submitBtn.disabled    = isLoading;                               // Prevents double-submit
+    btnText.textContent   = isLoading ? 'Sending…' : 'Send message'; // Updates button label
+    btnIcon.style.opacity = isLoading ? '0.3' : '1';                 // Dims icon while sending
+  }
+
+  /* ── Helper: show a status pill below the button ── */
+  // type: 'success' | 'error' — matches CSS class names
+  function showStatus(type, msg) {
+    formStatus.className     = `form-status ${type}`; // CSS handles color via .success / .error
+    formStatus.textContent   = msg;
+    formStatus.style.display = 'inline-block';        // Make visible (default is display:none)
+  }
+
+  /* ── Helper: hide the status pill ── */
+  function clearStatus() {
+    formStatus.style.display = 'none';
+    formStatus.textContent   = '';
+    formStatus.className     = 'form-status'; // Strip success/error modifier class
+  }
+}
+
+
+/* ───────────────────────────────────────────────────────────────
+   UTILITIES
+   ─────────────────────────────────────────────────────────────── */
+
+/**
+ * isValidEmail — basic email format check
+ * Regex breakdown:
+ *   ^[^\s@]+   → one or more chars that aren't whitespace or @
+ *   @          → literal @ symbol
+ *   [^\s@]+    → domain name part
+ *   \.         → literal dot
+ *   [^\s@]+$   → TLD (com, net, org, etc.)
+ *
+ * This isn't RFC-5321 compliant but covers 99.9% of real-world addresses.
+ * Full server-side validation happens in EmailJS / your email provider.
+ *
+ * @param  {string} email — the raw value from the email input
+ * @returns {boolean}
+ */
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LEVEL 3 — DARK / LIGHT THEME TOGGLE
+   ───────────────────────────────────────────────────────────────
+   Sets a [data-theme="dark" | "light"] attribute on <html>, which
+   every dark-mode override in style.css hooks into (see the
+   [data-theme="dark"] block near the top of the file).
+
+   Priority for the initial theme, first match wins:
+     1. A previously saved choice in localStorage ('portfolio-theme')
+     2. The visitor's OS-level preference (prefers-color-scheme)
+     3. Falls back to light
+
+   We only ever write to localStorage when the visitor actually
+   clicks the toggle — if we never touch it, the site keeps following
+   their OS preference even if they change it later (e.g. system
+   switches to dark mode at sunset).
+   ═══════════════════════════════════════════════════════════════ */
+function initThemeToggle() {
+  const toggle     = document.getElementById('themeToggle');
+  const root       = document.documentElement;
+  const STORAGE_KEY = 'portfolio-theme';
+
+  if (!toggle) return;
+
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const saved        = localStorage.getItem(STORAGE_KEY); // 'dark' | 'light' | null
+
+  applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+
+  toggle.addEventListener('click', () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    const next   = isDark ? 'light' : 'dark';
+    applyTheme(next);
+    // Only persist once the visitor has made an explicit choice
+    localStorage.setItem(STORAGE_KEY, next);
+  });
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+    } else {
+      root.removeAttribute('data-theme'); // absence of the attribute = light (default CSS)
+    }
+    toggle.setAttribute('aria-pressed', String(theme === 'dark'));
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LEVEL 3 — PROJECT FILTER PILLS
+   ───────────────────────────────────────────────────────────────
+   Each .filter-pill has a data-filter (e.g. "frontend"). Each
+   .project-card has a data-category string containing one or more
+   space-separated categories (e.g. "frontend fullstack").
+
+   Clicking a pill:
+     • Marks that pill .active or, if it's "all", exact match on
+       every card
+     • Toggles .is-hidden on any card whose data-category doesn't
+       contain the selected filter word
+   ═══════════════════════════════════════════════════════════════ */
+function initProjectFilters() {
+  const pills = document.querySelectorAll('.filter-pill');
+  const cards = document.querySelectorAll('.project-card');
+
+  if (!pills.length || !cards.length) return;
+
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      const filter = pill.dataset.filter; // e.g. 'all', 'frontend', 'backend'…
+
+      // Update active pill styling
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+
+      // Show/hide cards based on whether their data-category matches
+      cards.forEach(card => {
+        const categories = (card.dataset.category || '').split(' ');
+        const matches = filter === 'all' || categories.includes(filter);
+        card.classList.toggle('is-hidden', !matches);
+      });
+    });
+  });
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LEVEL 3 — CUSTOM CURSOR LABEL
+   ───────────────────────────────────────────────────────────────
+   While the mouse hovers a .project-card, #cursorLabel follows the
+   pointer and reads "View project" — replacing the native cursor
+   (hidden via `cursor: none` in CSS, scoped to pointer:fine devices
+   so touchscreens are completely unaffected — they never attach
+   these listeners at all).
+
+   Uses one shared mousemove listener on the card (not per-pixel
+   document-wide tracking) to keep this cheap: the label only moves
+   while actually over a card, and detaches cleanly on mouseleave.
+   ═══════════════════════════════════════════════════════════════ */
+function initCustomCursor() {
+  const label = document.getElementById('cursorLabel');
+  const cards = document.querySelectorAll('.project-card');
+
+  // Guard: skip entirely on touch/coarse-pointer devices (matches the
+  // @media (pointer: fine) block in CSS) — no point attaching listeners
+  // that a touchscreen visitor would never trigger anyway.
+  if (!label || !cards.length) return;
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      label.classList.add('visible');
+    });
+
+    card.addEventListener('mousemove', (e) => {
+      // Position the label directly at the cursor coordinates.
+      // CSS's translate(-50%, -50%) (in .cursor-label) centers it on that point.
+      label.style.left = `${e.clientX}px`;
+      label.style.top  = `${e.clientY}px`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      label.classList.remove('visible');
+    });
+  });
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LEVEL 4 — COMMAND PALETTE
+   ───────────────────────────────────────────────────────────────
+   Opens via the #cmdkTrigger button or Cmd/Ctrl+K from anywhere on
+   the page. Filters the .cmdk-item rows against the input using both
+   the visible label and each item's data-keywords. Up/Down move the
+   .active highlight, Enter activates the highlighted row, Esc (or a
+   click on the overlay backdrop) closes it.
+
+   Each item does ONE of two things on activation:
+     • data-href set   → smooth-scrolls to that anchor
+     • data-filter set → runs a named action (currently just "theme-toggle")
+   ═══════════════════════════════════════════════════════════════ */
+function initCommandPalette() {
+  const trigger  = document.getElementById('cmdkTrigger');
+  const overlay  = document.getElementById('cmdkOverlay');
+  const input    = document.getElementById('cmdkInput');
+  const list     = document.getElementById('cmdkList');
+  const empty    = document.getElementById('cmdkEmpty');
+  const items    = Array.from(document.querySelectorAll('.cmdk-item'));
+
+  if (!trigger || !overlay || !input || !list) return;
+
+  let activeIndex = 0;
+
+  function visibleItems() {
+    return items.filter(item => item.style.display !== 'none');
+  }
+
+  function open() {
+    overlay.hidden = false;
+    input.value = '';
+    filterItems('');
+    // Focus after the overlay is actually visible, otherwise some
+    // browsers ignore the focus() call on a still-hidden element.
+    requestAnimationFrame(() => input.focus());
+    document.body.style.overflow = 'hidden'; // prevent background scroll while open
+  }
+
+  function close() {
+    overlay.hidden = true;
+    document.body.style.overflow = '';
+    trigger.focus(); // return focus to the trigger for keyboard users
+  }
+
+  function filterItems(query) {
+    const q = query.trim().toLowerCase();
+
+    items.forEach(item => {
+      const label = item.querySelector('.cmdk-item-label').textContent.toLowerCase();
+      const keywords = (item.dataset.keywords || '').toLowerCase();
+      const matches = q === '' || label.includes(q) || keywords.includes(q);
+      item.style.display = matches ? '' : 'none';
+    });
+
+    const visible = visibleItems();
+    empty.hidden = visible.length > 0;
+    activeIndex = 0;
+    highlightActive();
+  }
+
+  function highlightActive() {
+    const visible = visibleItems();
+    items.forEach(item => item.classList.remove('active'));
+    if (visible[activeIndex]) {
+      visible[activeIndex].classList.add('active');
+      visible[activeIndex].scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function activate(item) {
+    if (!item) return;
+
+    if (item.dataset.href) {
+      close();
+      // Native smooth scroll — style.css already sets scroll-behavior:
+      // smooth on <html>, so a plain hash change is enough here.
+      const target = document.querySelector(item.dataset.href);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    } else if (item.dataset.filter === 'theme-toggle') {
+      close();
+      document.getElementById('themeToggle')?.click();
+    }
+  }
+
+  // Open triggers
+  trigger.addEventListener('click', open);
+  document.addEventListener('keydown', (e) => {
+    const isK = e.key === 'k' || e.key === 'K';
+    if ((e.metaKey || e.ctrlKey) && isK) {
+      e.preventDefault();
+      overlay.hidden ? open() : close();
+    }
+  });
+
+  // Close triggers
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close(); // only when clicking the backdrop itself
+  });
+
+  // In-palette keyboard nav
+  input.addEventListener('keydown', (e) => {
+    const visible = visibleItems();
+
+    if (e.key === 'Escape') {
+      close();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, visible.length - 1);
+      highlightActive();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      highlightActive();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      activate(visible[activeIndex]);
+    }
+  });
+
+  input.addEventListener('input', () => filterItems(input.value));
+
+  // Mouse click on a row also activates it
+  items.forEach(item => {
+    item.addEventListener('click', () => activate(item));
+    item.addEventListener('mouseenter', () => {
+      activeIndex = visibleItems().indexOf(item);
+      highlightActive();
+    });
+  });
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LEVEL 4 — CASE STUDY MODAL
+   ───────────────────────────────────────────────────────────────
+   Each .project-card carries a hidden .case-study-content sibling
+   (same data-project value links them). Clicking the card's
+   .case-study-btn clones that hidden block's HTML into the shared
+   #caseStudyBody and shows the modal. Keeping the content inline in
+   each project card (rather than a separate JS data object) means
+   editing a case study is just editing HTML, no JS knowledge needed.
+   ═══════════════════════════════════════════════════════════════ */
+function initCaseStudyModal() {
+  const overlay = document.getElementById('caseStudyOverlay');
+  const closeBtn = document.getElementById('caseStudyClose');
+  const titleEl = document.getElementById('caseStudyTitle');
+  const bodyEl  = document.getElementById('caseStudyBody');
+  const buttons = document.querySelectorAll('.case-study-btn');
+
+  if (!overlay || !buttons.length) return;
+
+  function open(projectKey) {
+    const source = document.querySelector(`.case-study-content[data-project="${projectKey}"]`);
+    const card = document.querySelector(`.project-card [data-project="${projectKey}"]`)
+      ?.closest('.project-card');
+    if (!source) return;
+
+    titleEl.textContent = card?.querySelector('.project-title')?.textContent || 'Case study';
+    bodyEl.innerHTML = source.innerHTML;
+    overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => closeBtn.focus());
+  }
+
+  function close() {
+    overlay.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => open(btn.dataset.project));
+  });
+
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !overlay.hidden) close();
+  });
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LEVEL 4 — LIVE GITHUB STATS
+   ───────────────────────────────────────────────────────────────
+   Pulls public profile + repo data from the unauthenticated GitHub
+   REST API (github.com/rest — no token needed, capped at 60 req/hr
+   per IP, which a personal portfolio's traffic won't come close to).
+
+   Two requests:
+     GET /users/{username}            → avatar, name, followers, public repo count
+     GET /users/{username}/repos      → used to compute total stars + top 3 repos
+
+   On any failure (offline, rate-limited, typo'd username) we fall
+   back to #githubError with a plain link to the profile — the section
+   never just breaks or shows blank/stale data.
+   ═══════════════════════════════════════════════════════════════ */
+function initGithubStats() {
+  const GITHUB_USERNAME = 'comsolodev-1'; // ← change this if the account changes
+
+  const loading   = document.getElementById('githubLoading');
+  const body      = document.getElementById('githubBody');
+  const errorBox  = document.getElementById('githubError');
+  const errorLink = document.getElementById('githubErrorLink');
+
+  if (!loading || !body || !errorBox) return;
+
+  errorLink.href = `https://github.com/${GITHUB_USERNAME}`;
+
+  Promise.all([
+    fetch(`https://api.github.com/users/${GITHUB_USERNAME}`).then(r => {
+      if (!r.ok) throw new Error('profile fetch failed');
+      return r.json();
+    }),
+    fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`).then(r => {
+      if (!r.ok) throw new Error('repos fetch failed');
+      return r.json();
+    })
+  ])
+    .then(([profile, repos]) => {
+      renderGithub(profile, repos);
+      loading.hidden = true;
+      body.hidden = false;
+    })
+    .catch(() => {
+      loading.hidden = true;
+      errorBox.hidden = false;
+    });
+
+  function renderGithub(profile, repos) {
+    document.getElementById('githubAvatar').src = profile.avatar_url;
+    document.getElementById('githubAvatar').alt = `${profile.login}'s GitHub avatar`;
+    document.getElementById('githubName').textContent = profile.name || profile.login;
+
+    const handleEl = document.getElementById('githubHandle');
+    handleEl.textContent = `@${profile.login}`;
+    handleEl.href = profile.html_url;
+
+    document.getElementById('githubFollow').href = profile.html_url;
+    document.getElementById('githubRepos').textContent = profile.public_repos ?? '—';
+    document.getElementById('githubFollowers').textContent = profile.followers ?? '—';
+
+    const totalStars = Array.isArray(repos)
+      ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0)
+      : 0;
+    document.getElementById('githubStars').textContent = totalStars;
+
+    // Top 3 repos by star count, excluding forks (forks aren't really "your" work)
+    const topRepos = Array.isArray(repos)
+      ? repos
+          .filter(r => !r.fork)
+          .sort((a, b) => b.stargazers_count - a.stargazers_count)
+          .slice(0, 3)
+      : [];
+
+    const repoList = document.getElementById('githubRepoList');
+    repoList.innerHTML = topRepos.map(repo => `
+      <a class="github-repo" href="${repo.html_url}" target="_blank" rel="noopener">
+        <span class="github-repo-name">${escapeHtml(repo.name)}</span>
+        <span class="github-repo-meta">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          ${repo.stargazers_count}
+        </span>
+      </a>
+    `).join('');
+  }
+
+  // Minimal HTML-escaping for repo names before injecting via innerHTML —
+  // repo names are attacker-controlled-ish (anyone can name a public repo
+  // anything), so this is cheap insurance against a stray "<" breaking markup.
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LEVEL 4 — HERO MOUSE PARALLAX
+   ───────────────────────────────────────────────────────────────
+   Tracks the mouse position within the hero section and writes it as
+   --parallax-x / --parallax-y custom properties on #hero, in a small
+   ±px range. The actual transform + easing lives entirely in CSS
+   (see the pointer:fine block in style.css) — this function only ever
+   sets two numbers, so it stays cheap even on mousemove.
+
+   Skipped entirely on touch/coarse-pointer devices and when the
+   visitor has prefers-reduced-motion on.
+   ═══════════════════════════════════════════════════════════════ */
+function initHeroParallax() {
+  const hero = document.getElementById('hero');
+  if (!hero) return;
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+  if (prefersReducedMotion || !isFinePointer) return;
+
+  const MAX_OFFSET_PX = 10; // how far elements are allowed to drift from center
+
+  hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
+    // Position within the hero, from -1 (left/top edge) to 1 (right/bottom edge)
+    const relX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const relY = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+
+    hero.style.setProperty('--parallax-x', `${relX * MAX_OFFSET_PX}px`);
+    hero.style.setProperty('--parallax-y', `${relY * MAX_OFFSET_PX}px`);
+  });
+
+  hero.addEventListener('mouseleave', () => {
+    hero.style.setProperty('--parallax-x', '0px');
+    hero.style.setProperty('--parallax-y', '0px');
+  });
+}
