@@ -338,87 +338,70 @@
         this makes the four cards cascade in one after another instead of
         popping in as a single flat block.
         skill-card--accent on the first card → dark/inverted for visual contrast.
+
+        TECH ICONS — Level 4 refactor
+        Each card's .skill-icons-img pulls a live-rendered row of real
+        brand logos from skillicons.dev (a free, no-signup icon-rendering
+        service — just an <img>, no API key, no backend). The &theme=
+        query param is swapped between "light"/"dark" by
+        updateThemedGithubAssets() in main.js whenever the site's
+        dark-mode toggle fires, so the icons always match the page.
+        data-icons holds the raw slug list so that function can rebuild
+        the URL without re-parsing the existing src.
       -->
       <div class="skills-grid">
 
         <!-- CARD 1: Frontend — inverted dark card -->
         <div class="skill-card skill-card--accent fade-in">
           <span class="skill-index" aria-hidden="true">01</span>
-          <!-- aria-hidden on icon SVGs — decorative, label already in h3 -->
-          <div class="skill-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="1.5">
-              <rect x="2" y="3" width="20" height="14" rx="2"/>
-              <path d="M8 21h8M12 17v4"/>
-            </svg>
-          </div>
           <h3 class="skill-category">Frontend</h3>
-          <div class="skill-chips">
-            <span class="skill-chip">React / Next.js</span>
-            <span class="skill-chip">TypeScript</span>
-            <span class="skill-chip">Tailwind CSS</span>
-            <span class="skill-chip">HTML &amp; CSS</span>
-            <span class="skill-chip">Figma (basics)</span>
-          </div>
+          <img class="skill-icons-img"
+               data-icons="react,nextjs,ts,tailwind,figma"
+               data-perline="5"
+               data-fixed-theme="dark"
+               src="https://skillicons.dev/icons?i=react,nextjs,ts,tailwind,figma&theme=dark&perline=5"
+               alt="Frontend stack: React, Next.js, TypeScript, Tailwind CSS, Figma"
+               width="250" height="50" loading="lazy" />
+          <p class="skill-caption">React · Next.js · TypeScript · Tailwind · Figma</p>
         </div>
 
         <!-- CARD 2: Backend -->
         <div class="skill-card fade-in">
           <span class="skill-index" aria-hidden="true">02</span>
-          <div class="skill-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="1.5">
-              <path d="M5 12H3l9-9 9 9h-2M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>
-            </svg>
-          </div>
           <h3 class="skill-category">Backend</h3>
-          <div class="skill-chips">
-            <span class="skill-chip">Node.js / Express</span>
-            <span class="skill-chip">REST APIs</span>
-            <span class="skill-chip">GraphQL</span>
-            <span class="skill-chip">Python / FastAPI</span>
-            <span class="skill-chip">WebSockets</span>
-          </div>
+          <img class="skill-icons-img"
+               data-icons="nodejs,express,graphql,py,socketio"
+               data-perline="5"
+               src="https://skillicons.dev/icons?i=nodejs,express,graphql,py,socketio&theme=light&perline=5"
+               alt="Backend stack: Node.js, Express, GraphQL, Python, WebSockets"
+               width="250" height="50" loading="lazy" />
+          <p class="skill-caption">Node.js · Express · GraphQL · Python · WebSockets</p>
         </div>
 
         <!-- CARD 3: Database -->
         <div class="skill-card fade-in">
           <span class="skill-index" aria-hidden="true">03</span>
-          <div class="skill-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="1.5">
-              <ellipse cx="12" cy="5" rx="9" ry="3"/>
-              <path d="M3 5v14a9 3 0 0 0 18 0V5"/>
-              <path d="M3 12a9 3 0 0 0 18 0"/>
-            </svg>
-          </div>
           <h3 class="skill-category">Database</h3>
-          <div class="skill-chips">
-            <span class="skill-chip">PostgreSQL</span>
-            <span class="skill-chip">MongoDB</span>
-            <span class="skill-chip">Redis</span>
-            <span class="skill-chip">Prisma ORM</span>
-            <span class="skill-chip">SQL</span>
-          </div>
+          <img class="skill-icons-img"
+               data-icons="postgres,mongodb,redis,prisma"
+               data-perline="4"
+               src="https://skillicons.dev/icons?i=postgres,mongodb,redis,prisma&theme=light&perline=4"
+               alt="Database stack: PostgreSQL, MongoDB, Redis, Prisma ORM"
+               width="200" height="50" loading="lazy" />
+          <p class="skill-caption">PostgreSQL · MongoDB · Redis · Prisma</p>
         </div>
 
         <!-- CARD 4: Tools & DevOps -->
         <div class="skill-card fade-in">
           <span class="skill-index" aria-hidden="true">04</span>
-          <div class="skill-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="1.5">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-            </svg>
-          </div>
           <h3 class="skill-category">Tools &amp; Ops</h3>
-          <div class="skill-chips">
-            <span class="skill-chip">Git / GitHub</span>
-            <span class="skill-chip">Docker</span>
-            <span class="skill-chip">CI/CD (GitHub Actions)</span>
-            <span class="skill-chip">Vercel / Railway</span>
-            <span class="skill-chip">Linux CLI</span>
-          </div>
+          <img class="skill-icons-img"
+               data-icons="git,github,docker,actions,vercel,linux"
+               data-perline="4"
+               src="https://skillicons.dev/icons?i=git,github,docker,actions,vercel,linux&theme=light&perline=4"
+               alt="Tools: Git, GitHub, Docker, GitHub Actions, Vercel, Linux"
+               width="200" height="100" loading="lazy" />
+          <p class="skill-caption">Git · GitHub · Docker · CI/CD · Vercel · Linux</p>
         </div>
 
       </div><!-- /skills-grid -->
@@ -562,6 +545,30 @@
             </a>
           </div>
 
+          <!--
+            CONTRIBUTION GRAPH — Level 4 addition, the centerpiece of this
+            section now (more telling than raw follower/repo counts).
+            Rendered by ghchart.rshah.org — a free, no-signup image service
+            that draws the same 52-week activity calendar GitHub shows on
+            profiles, from just a username in the URL. It's a plain <img>,
+            so there's no API call to manage on our end; we just handle
+            the load/error events for a skeleton + graceful fallback.
+            initGithubStats() sets the real src and swaps its color to
+            match light/dark mode.
+          -->
+          <div class="github-contrib">
+            <p class="github-contrib-label">Contribution activity (last 12 months)</p>
+            <div class="github-contrib-wrap">
+              <div class="gh-skel gh-skel--contrib" id="githubContribSkeleton"></div>
+              <img class="github-contrib-img" id="githubContribImg"
+                   alt="GitHub contribution calendar" hidden />
+            </div>
+            <p class="github-contrib-fallback" id="githubContribFallback" hidden>
+              Live contribution graph is unavailable right now —
+              <a id="githubContribFallbackLink" href="#" target="_blank" rel="noopener">view it on GitHub</a>.
+            </p>
+          </div>
+
           <div class="github-stats-row">
             <div class="github-stat">
               <span class="github-stat-num" id="githubRepos">—</span>
@@ -680,13 +687,37 @@
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
           </button>
+          <!--
+            Structured as a 3-step numbered flow (Problem → Process → Result)
+            instead of plain stacked headings/paragraphs — reuses the same
+            numbered-circle + connecting-line language as the Experience
+            timeline, so it reads as "the site's case study format" rather
+            than a wall of text. See .cs-flow / .cs-step in style.css.
+          -->
           <div class="case-study-content" data-project="alpha" hidden>
-            <h4>The problem</h4>
-            <p>The client was running billing and usage tracking through a patchwork of spreadsheets and a third-party dashboard that didn't talk to their own database, so support tickets about incorrect invoices were a weekly occurrence.</p>
-            <h4>The process</h4>
-            <p>Designed a Postgres schema that treated usage events as the source of truth, then layered Stripe's metered billing on top so invoices generate directly from real usage instead of a manually maintained count. Built the dashboard in Next.js with server components for the data-heavy views to keep first load fast.</p>
-            <h4>The result</h4>
-            <p>Billing-related support tickets dropped to near zero after launch, and the client could finally see real-time usage per customer instead of waiting on end-of-month exports.</p>
+            <div class="cs-flow">
+              <div class="cs-step">
+                <span class="cs-step-num">1</span>
+                <div class="cs-step-body">
+                  <h4>The problem</h4>
+                  <p>The client was running billing and usage tracking through a patchwork of spreadsheets and a third-party dashboard that didn't talk to their own database, so support tickets about incorrect invoices were a weekly occurrence.</p>
+                </div>
+              </div>
+              <div class="cs-step">
+                <span class="cs-step-num">2</span>
+                <div class="cs-step-body">
+                  <h4>The process</h4>
+                  <p>Designed a Postgres schema that treated usage events as the source of truth, then layered Stripe's metered billing on top so invoices generate directly from real usage instead of a manually maintained count. Built the dashboard in Next.js with server components for the data-heavy views to keep first load fast.</p>
+                </div>
+              </div>
+              <div class="cs-step cs-step--result">
+                <span class="cs-step-num">✓</span>
+                <div class="cs-step-body">
+                  <h4>The result</h4>
+                  <p>Billing-related support tickets dropped to near zero after launch, and the client could finally see real-time usage per customer instead of waiting on end-of-month exports.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </article>
 
@@ -724,12 +755,29 @@
             </svg>
           </button>
           <div class="case-study-content" data-project="cli" hidden>
-            <h4>The problem</h4>
-            <p>Every project on the team hand-wrote TypeScript interfaces for API responses, and they'd silently go stale the moment the backend changed a field — bugs that only showed up at runtime.</p>
-            <h4>The process</h4>
-            <p>Built a CLI that hits a given endpoint, infers the shape of the JSON response, and generates matching TypeScript types automatically, with a watch mode for local development. Published it as an open-source npm package with a small, dependency-light core so it'd be easy for other maintainers to audit.</p>
-            <h4>The result</h4>
-            <p>Picked up 400+ GitHub stars in its first month and got adopted by a couple of other teams outside the original project, without any marketing beyond a single Show HN-style post.</p>
+            <div class="cs-flow">
+              <div class="cs-step">
+                <span class="cs-step-num">1</span>
+                <div class="cs-step-body">
+                  <h4>The problem</h4>
+                  <p>Every project on the team hand-wrote TypeScript interfaces for API responses, and they'd silently go stale the moment the backend changed a field — bugs that only showed up at runtime.</p>
+                </div>
+              </div>
+              <div class="cs-step">
+                <span class="cs-step-num">2</span>
+                <div class="cs-step-body">
+                  <h4>The process</h4>
+                  <p>Built a CLI that hits a given endpoint, infers the shape of the JSON response, and generates matching TypeScript types automatically, with a watch mode for local development. Published it as an open-source npm package with a small, dependency-light core so it'd be easy for other maintainers to audit.</p>
+                </div>
+              </div>
+              <div class="cs-step cs-step--result">
+                <span class="cs-step-num">✓</span>
+                <div class="cs-step-body">
+                  <h4>The result</h4>
+                  <p>Picked up 400+ GitHub stars in its first month and got adopted by a couple of other teams outside the original project, without any marketing beyond a single Show HN-style post.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </article>
 
@@ -769,12 +817,29 @@
             </svg>
           </button>
           <div class="case-study-content" data-project="ecommerce" hidden>
-            <h4>The problem</h4>
-            <p>The client's existing store was locked into a template-based platform that couldn't support the custom product configurator their catalog needed, and every content change required a developer.</p>
-            <h4>The process</h4>
-            <p>Went headless: React storefront on the frontend, Sanity as the content layer so the client's team could edit products and pages themselves, and Stripe handling payments and subscription billing for a recurring-order option. Paid particular attention to checkout performance since that's where drop-off actually costs revenue.</p>
-            <h4>The result</h4>
-            <p>The store now handles 500+ orders per day, and the client's own team ships content and product changes without opening a ticket.</p>
+            <div class="cs-flow">
+              <div class="cs-step">
+                <span class="cs-step-num">1</span>
+                <div class="cs-step-body">
+                  <h4>The problem</h4>
+                  <p>The client's existing store was locked into a template-based platform that couldn't support the custom product configurator their catalog needed, and every content change required a developer.</p>
+                </div>
+              </div>
+              <div class="cs-step">
+                <span class="cs-step-num">2</span>
+                <div class="cs-step-body">
+                  <h4>The process</h4>
+                  <p>Went headless: React storefront on the frontend, Sanity as the content layer so the client's team could edit products and pages themselves, and Stripe handling payments and subscription billing for a recurring-order option. Paid particular attention to checkout performance since that's where drop-off actually costs revenue.</p>
+                </div>
+              </div>
+              <div class="cs-step cs-step--result">
+                <span class="cs-step-num">✓</span>
+                <div class="cs-step-body">
+                  <h4>The result</h4>
+                  <p>The store now handles 500+ orders per day, and the client's own team ships content and product changes without opening a ticket.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </article>
 

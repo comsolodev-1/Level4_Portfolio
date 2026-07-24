@@ -912,98 +912,47 @@ section {
 
 .skill-card--accent .skill-index { color: var(--gray-600); }
 
-.skill-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background-color: var(--gray-100);
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  color: var(--gray-600);
-  margin-bottom: 1.25rem;
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
-  -webkit-transition: -webkit-transform 0.3s ease;
-          transition: transform 0.3s ease;
-}
-
-/* Icon reacts to hovering the whole card, not just itself —
-   reinforces that the card is one clickable/hoverable unit */
-.skill-card:hover .skill-icon {
-  -webkit-transform: rotate(-8deg) scale(1.08);
-      -ms-transform: rotate(-8deg) scale(1.08);
-          transform: rotate(-8deg) scale(1.08);
-}
-
-.skill-card--accent .skill-icon {
-  background-color: rgba(255,255,255,0.1);
-  color: var(--gray-300);
-}
-
 .skill-category {
   font-family: var(--font-display);
   font-size: 13.5px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text-primary);
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
 }
 
 .skill-card--accent .skill-category { color: var(--white); }
 
-/* Skill chips — replaces the old plain bulleted list with a
-   flex-wrap of small pills, each with its own hover state.
-   More visually active than a static vertical list of text. */
-.skill-chips {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  gap: 6px;
+/* Tech icon row — real brand logos from skillicons.dev instead of the
+   old generic outline icon + plain text-pill list. The <img> itself
+   controls sizing (intrinsic w/h ratio from its query string), we just
+   cap it to the card width and let it scale down on narrow/mobile cards. */
+.skill-icons-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 0.85rem;
+  -webkit-transition: -webkit-transform 0.3s ease;
+          transition: transform 0.3s ease;
 }
 
-.skill-chip {
-  font-size: 12px;
+/* Whole card hover nudges the icon row slightly — same "the card is one
+   hoverable unit" idea the old rotating icon had, just applied to the
+   new element. */
+.skill-card:hover .skill-icons-img {
+  -webkit-transform: translateY(-2px) scale(1.03);
+      -ms-transform: translateY(-2px) scale(1.03);
+          transform: translateY(-2px) scale(1.03);
+}
+
+.skill-caption {
   font-family: var(--font-mono);
+  font-size: 11.5px;
   color: var(--text-muted);
-  background-color: var(--gray-100);
-  border: 1px solid var(--border);
-  padding: 4px 10px;
-  border-radius: 100px;
-  line-height: 1.4;
-  white-space: nowrap;
-  -webkit-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, -webkit-transform 0.2s ease;
-          transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  line-height: 1.6;
 }
 
-.skill-card:hover .skill-chip:hover {
-  background-color: var(--gray-900);
-  border-color: var(--gray-900);
-  color: var(--white);
-  -webkit-transform: translateY(-2px);
-      -ms-transform: translateY(-2px);
-          transform: translateY(-2px);
-}
-
-.skill-card--accent .skill-chip {
-  background-color: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.14);
-  color: var(--gray-300);
-}
-
-.skill-card--accent:hover .skill-chip:hover {
-  background-color: var(--white);
-  border-color: var(--white);
-  color: var(--gray-900);
-}
+.skill-card--accent .skill-caption { color: var(--gray-500); }
 
 /* Staggered entrance — each card gets a slightly later delay than the
    one before it, so the whole row cascades in left-to-right instead
@@ -2328,6 +2277,70 @@ footer {
   color: var(--text-mid);
 }
 
+/*
+  CASE STUDY FLOW — Level 4 refactor
+  Replaces the old flat stack of h4/p pairs with a vertical numbered
+  flow: Problem → Process → Result, connected by a line, mirroring the
+  same numbered-circle language the Experience timeline already uses.
+  Kept strictly vertical (not a horizontal stepper) so it holds up on
+  narrow mobile screens without needing its own breakpoint logic.
+*/
+.cs-flow {
+  position: relative;
+  padding-left: 2.35rem;
+}
+
+/* Connecting line running behind the numbered circles */
+.cs-flow::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background-color: var(--border);
+}
+
+.cs-step {
+  position: relative;
+  padding-bottom: 1.6rem;
+}
+
+.cs-step:last-child { padding-bottom: 0; }
+
+.cs-step-num {
+  position: absolute;
+  left: -2.35rem;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  background-color: var(--gray-900);
+  color: var(--white);
+  border: 3px solid var(--surface); /* punches a clean gap in the line behind it */
+}
+
+/* Result step's circle gets a soft ring so the "outcome" step reads as
+   the payoff at a glance, without introducing an off-brand accent color */
+.cs-step--result .cs-step-num {
+  -webkit-box-shadow: 0 0 0 3px var(--border-soft);
+          box-shadow: 0 0 0 3px var(--border-soft);
+}
+
+.cs-step-body h4:first-child { margin-top: 0; }
+
 /* ── C. Case study button (inside .project-card) ── */
 .case-study-btn {
   display: -webkit-inline-box;
@@ -2438,6 +2451,58 @@ footer {
   margin-left: auto;
   font-size: 12.5px;
   padding: 7px 16px;
+}
+
+/* ── Contribution graph ── */
+.github-contrib {
+  margin-bottom: 1.5rem;
+}
+
+.github-contrib-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.6rem;
+}
+
+.github-contrib-wrap {
+  position: relative;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r);
+  padding: 0.85rem;
+  /* Horizontal scroll on narrow/mobile screens rather than squashing
+     the calendar illegibly small — the graph keeps its real aspect
+     ratio and the visitor can swipe through the weeks. */
+  overflow-x: auto;
+}
+
+.github-contrib-img {
+  display: block;
+  min-width: 640px; /* keeps individual week-cells touch-legible even while scrollable on mobile */
+  width: 100%;
+  height: auto;
+}
+
+.gh-skel--contrib {
+  width: 100%;
+  height: 110px;
+}
+
+/* Once the real image has loaded, JS removes the skeleton from the DOM
+   flow (display:none) rather than layering them — no need for a fade
+   here since the swap happens the instant the image is ready. */
+
+.github-contrib-fallback {
+  font-size: 12.5px;
+  color: var(--text-faint);
+  padding: 0.5rem 0.1rem 0;
+}
+
+.github-contrib-fallback a {
+  color: var(--text-muted);
+  text-decoration: underline;
 }
 
 .github-stats-row {

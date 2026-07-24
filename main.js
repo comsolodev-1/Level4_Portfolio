@@ -58,6 +58,10 @@ const EMAILJS_SERVICE_ID      = 'service_14ae3x5';       // Email Services → y
 const EMAILJS_NOTIFY_TEMPLATE = 'template_5ezztvb';  // Template 1 → sends to YOU
 const EMAILJS_REPLY_TEMPLATE  = 'template_gz347wb';   // Template 2 → sends to VISITOR
 
+// Used by both initGithubStats() and applyThemedMedia() below —
+// pulled up to module scope so there's exactly one place to change it.
+const GITHUB_USERNAME = 'comsolodev-1';
+
 
 /* ───────────────────────────────────────────────────────────────
    INIT — Entry point
@@ -434,6 +438,11 @@ function initThemeToggle() {
       root.removeAttribute('data-theme'); // absence of the attribute = light (default CSS)
     }
     toggle.setAttribute('aria-pressed', String(theme === 'dark'));
+    // Keep the skillicons.dev rows and GitHub contribution graph in sync —
+    // those are plain <img> tags, so "theme" for them just means swapping
+    // a query-string param and re-requesting the image.
+    syncSkillIcons();
+    syncGithubContribGraph();
   }
 }
 
@@ -703,6 +712,49 @@ function initCaseStudyModal() {
 
 
 /* ═══════════════════════════════════════════════════════════════
+   LEVEL 4 — THEMED MEDIA HELPERS
+   ───────────────────────────────────────────────────────────────
+   Two small helpers shared by initThemeToggle() and initGithubStats().
+   Both the skillicons.dev logo rows and the ghchart.rshah.org
+   contribution graph are just <img> tags pointed at services that
+   accept a color/theme in the query string — so "supporting dark
+   mode" for them means rebuilding that URL, not writing any real
+   theme-switching logic.
+   ═══════════════════════════════════════════════════════════════ */
+
+function currentSiteTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+}
+
+function syncSkillIcons() {
+  const theme = currentSiteTheme();
+
+  document.querySelectorAll('.skill-icons-img').forEach(img => {
+    const icons = img.dataset.icons;
+    if (!icons) return;
+    const perline = img.dataset.perline || 5;
+    // data-fixed-theme (set on the Frontend card, which has a permanently
+    // dark background) always wins over the page's current theme —
+    // otherwise light-mode icons would go near-invisible on that card.
+    const useTheme = img.dataset.fixedTheme || theme;
+    img.src = `https://skillicons.dev/icons?i=${icons}&theme=${useTheme}&perline=${perline}`;
+  });
+}
+
+function syncGithubContribGraph() {
+  const img = document.getElementById('githubContribImg');
+  if (!img) return;
+
+  const theme = currentSiteTheme();
+  // ghchart takes a single hex color and renders the whole calendar in
+  // shades of it. Light gray reads clearly on the dark surface, dark
+  // gray reads clearly on the light one.
+  const color = theme === 'dark' ? 'e4e4e7' : '18181b';
+  img.src = `https://ghchart.rshah.org/${color}/${GITHUB_USERNAME}`;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
    LEVEL 4 — LIVE GITHUB STATS
    ───────────────────────────────────────────────────────────────
    Pulls public profile + repo data from the unauthenticated GitHub
@@ -718,8 +770,6 @@ function initCaseStudyModal() {
    never just breaks or shows blank/stale data.
    ═══════════════════════════════════════════════════════════════ */
 function initGithubStats() {
-  const GITHUB_USERNAME = 'comsolodev-1'; // ← change this if the account changes
-
   const loading   = document.getElementById('githubLoading');
   const body      = document.getElementById('githubBody');
   const errorBox  = document.getElementById('githubError');
@@ -728,6 +778,35 @@ function initGithubStats() {
   if (!loading || !body || !errorBox) return;
 
   errorLink.href = `https://github.com/${GITHUB_USERNAME}`;
+
+  // ── Contribution graph wiring ──
+  // Attach the load/error handlers BEFORE the src is (re)assigned by
+  // applyThemedMedia() below — safe here because image loading is always
+  // asynchronous (queued as its own task), so nothing can fire before
+  // this synchronous DOMContentLoaded callback finishes running.
+  const contribImg      = document.getElementById('githubContribImg');
+  const contribSkeleton = document.getElementById('githubContribSkeleton');
+  const contribFallback = document.getElementById('githubContribFallback');
+  const contribFallbackLink = document.getElementById('githubContribFallbackLink');
+
+  if (contribImg) {
+    contribFallbackLink.href = `https://github.com/${GITHUB_USERNAME}`;
+
+    contribImg.addEventListener('load', () => {
+      contribSkeleton.style.display = 'none';
+      contribImg.hidden = false;
+    });
+
+    contribImg.addEventListener('error', () => {
+      contribSkeleton.style.display = 'none';
+      contribImg.hidden = true;
+      contribFallback.hidden = false;
+    });
+
+    // Kicks off the actual request using whatever theme is currently
+    // active (applyThemedMedia also re-runs this on every toggle click).
+    syncGithubContribGraph();
+  }
 
   Promise.all([
     fetch(`https://api.github.com/users/${GITHUB_USERNAME}`).then(r => {
