@@ -2120,6 +2120,14 @@ footer {
   padding: 12vh 1.25rem 0;
 }
 
+/* Higher specificity than `.cmdk-overlay { display: flex }` above, so this
+   correctly wins and actually hides the overlay when JS sets [hidden].
+   Without this, the plain hidden attribute gets silently overridden by
+   the display:flex rule and the overlay never visually disappears. */
+.cmdk-overlay[hidden] {
+  display: none;
+}
+
 .cmdk-panel {
   width: 100%;
   max-width: 560px;
@@ -2236,6 +2244,12 @@ footer {
       -ms-flex-pack: center;
           justify-content: center;
   padding: 1.25rem;
+}
+
+/* Same fix as .cmdk-overlay[hidden] above — needed so JS's [hidden]
+   attribute actually wins over the display:flex rule. */
+.modal-overlay[hidden] {
+  display: none;
 }
 
 .modal-panel {
@@ -2358,6 +2372,11 @@ footer {
       -ms-flex-align: center;
           align-items: center;
   gap: 14px;
+}
+
+/* Same [hidden]-vs-display:flex fix as the overlays above */
+.github-loading[hidden] {
+  display: none;
 }
 
 .gh-skel {
