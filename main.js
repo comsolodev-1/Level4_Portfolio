@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initProjectFilters();
   initCustomCursor();
   initCommandPalette();
+  initExperienceToggles();
   initCaseStudyModal();
   initGithubStats();
   initHeroParallax();
@@ -662,6 +663,25 @@ function initCommandPalette() {
 
 
 /* ═══════════════════════════════════════════════════════════════
+   LEVEL 4.1 — EXPERIENCE "KEY ACHIEVEMENTS" TOGGLES
+   ───────────────────────────────────────────────────────────────
+   Each .exp-item has a collapsed-by-default achievements list. Unlike
+   the case study accordion, this content is static and present at
+   page load (not re-injected on open), so it only needs to be wired
+   up once here — no re-initialization logic needed.
+   ═══════════════════════════════════════════════════════════════ */
+function initExperienceToggles() {
+  document.querySelectorAll('.exp-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const item = toggle.closest('.exp-item');
+      const isOpen = item.classList.toggle('achievements-open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
    LEVEL 4 — CASE STUDY MODAL
    ───────────────────────────────────────────────────────────────
    Each .project-card carries a hidden .case-study-content sibling
@@ -709,18 +729,25 @@ function initCaseStudyModal() {
   // Wires up the Problem/Process/Result accordion inside whatever
   // content was just injected. First step opens by default (so the
   // modal doesn't look empty the instant it appears); the rest start
-  // collapsed and wait for a tap.
+  // collapsed and wait for a tap. Also drives the .cs-progress dots —
+  // each dot marks "seen" the first time its matching step is opened,
+  // and stays marked even if the step is collapsed again afterward.
   function initStepAccordion(scope) {
     const steps = scope.querySelectorAll('.cs-step');
+    const dots  = scope.querySelectorAll('.cs-progress-dot');
 
     steps.forEach((step, index) => {
       const header = step.querySelector('.cs-step-header');
       if (!header) return;
 
-      setStepOpen(step, header, index === 0);
+      const startOpen = index === 0;
+      setStepOpen(step, header, startOpen);
+      if (startOpen && dots[index]) dots[index].classList.add('seen');
 
       header.addEventListener('click', () => {
-        setStepOpen(step, header, !step.classList.contains('open'));
+        const willOpen = !step.classList.contains('open');
+        setStepOpen(step, header, willOpen);
+        if (willOpen && dots[index]) dots[index].classList.add('seen');
       });
     });
   }
@@ -899,8 +926,10 @@ function initContribGraph() {
   const fallbackLink = document.getElementById('githubContribFallbackLink');
   const filterPills = document.querySelectorAll('.contrib-filter-pill');
   const customRow  = document.getElementById('contribCustomRange');
-  const customFrom = document.getElementById('contribFrom');
-  const customTo   = document.getElementById('contribTo');
+  const fromMonthSel = document.getElementById('contribFromMonth');
+  const fromYearSel  = document.getElementById('contribFromYear');
+  const toMonthSel   = document.getElementById('contribToMonth');
+  const toYearSel    = document.getElementById('contribToYear');
   const customApply = document.getElementById('contribApply');
 
   if (!gridEl) return;
@@ -909,6 +938,12 @@ function initContribGraph() {
 
   const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   let contributions = []; // populated once the fetch resolves, then reused by every re-render
+
+  // Build the month/year <select> options once, up front. Years only
+  // need to span what the API actually gives us (a trailing 12 months,
+  // so at most two calendar years) — no point offering a 10-year range
+  // when there's no data behind most of it.
+  populateMonthYearSelects();
 
   fetch(`https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}?y=last`)
     .then(r => {
@@ -923,14 +958,16 @@ function initContribGraph() {
       // Default view on load: 6 months
       render(6);
 
-      // Pre-fill the custom-range pickers with a sensible default
-      // (this year's Jan → current month) so they're not empty if
-      // someone opens "Custom" without picking dates first.
+      // Pre-set the custom-range selects to a sensible default (6
+      // months ago → this month) so Apply works even if the visitor
+      // never touches the dropdowns themselves.
       const now = new Date();
-      customTo.value = monthInputValue(now);
+      setSelectValue(toMonthSel, now.getMonth() + 1);
+      setSelectValue(toYearSel, now.getFullYear());
       const sixAgo = new Date(now);
       sixAgo.setMonth(sixAgo.getMonth() - 6);
-      customFrom.value = monthInputValue(sixAgo);
+      setSelectValue(fromMonthSel, sixAgo.getMonth() + 1);
+      setSelectValue(fromYearSel, sixAgo.getFullYear());
     })
     .catch(() => {
       skeleton.style.display = 'none';
@@ -954,9 +991,28 @@ function initContribGraph() {
   });
 
   customApply.addEventListener('click', () => {
-    if (!customFrom.value || !customTo.value) return;
-    render(null, customFrom.value, customTo.value);
+    const fromValue = `${fromYearSel.value}-${String(fromMonthSel.value).padStart(2, '0')}`;
+    const toValue   = `${toYearSel.value}-${String(toMonthSel.value).padStart(2, '0')}`;
+    render(null, fromValue, toValue);
   });
+
+  function populateMonthYearSelects() {
+    const monthOptions = MONTH_ABBR
+      .map((name, i) => `<option value="${i + 1}">${name}</option>`)
+      .join('');
+
+    const currentYear = new Date().getFullYear();
+    const yearOptions = [currentYear - 1, currentYear]
+      .map(y => `<option value="${y}">${y}</option>`)
+      .join('');
+
+    [fromMonthSel, toMonthSel].forEach(sel => { sel.innerHTML = monthOptions; });
+    [fromYearSel, toYearSel].forEach(sel => { sel.innerHTML = yearOptions; });
+  }
+
+  function setSelectValue(selectEl, value) {
+    selectEl.value = String(value);
+  }
 
   /**
    * Renders the grid for either:
@@ -1070,10 +1126,6 @@ function initContribGraph() {
   function formatMonthInput(monthValue) {
     const [y, m] = monthValue.split('-');
     return `${MONTH_ABBR[parseInt(m, 10) - 1]} ${y}`;
-  }
-
-  function monthInputValue(date) {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   }
 }
 

@@ -333,6 +333,19 @@
       </div>
 
       <!--
+        Legend for the proficiency bars — without this, the little bars
+        next to each skill are just unexplained gray marks. Also shown
+        as a live example (3 filled / 2 empty) rather than only in words,
+        so it reads at a glance even before you look at any actual skill.
+      -->
+      <p class="skills-legend">
+        <span class="skills-legend-example" aria-hidden="true">
+          <span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span>
+        </span>
+        = self-rated proficiency, out of 5
+      </p>
+
+      <!--
         fade-in is now on each .skill-card individually (not the container) —
         combined with the nth-child transition-delay rules in style.css,
         this makes the four cards cascade in one after another instead of
@@ -363,35 +376,35 @@
                    src="https://skillicons.dev/icons?i=react&theme=dark"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">React</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">5/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="nextjs" data-fixed-theme="dark"
                    src="https://skillicons.dev/icons?i=nextjs&theme=dark"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Next.js</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">4/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="ts" data-fixed-theme="dark"
                    src="https://skillicons.dev/icons?i=ts&theme=dark"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">TypeScript</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">4/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="tailwind" data-fixed-theme="dark"
                    src="https://skillicons.dev/icons?i=tailwind&theme=dark"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Tailwind CSS</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">5/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="figma" data-fixed-theme="dark"
                    src="https://skillicons.dev/icons?i=figma&theme=dark"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Figma</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">3/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
             </div>
           </div>
         </div>
@@ -406,35 +419,35 @@
                    src="https://skillicons.dev/icons?i=nodejs&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Node.js</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">5/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="express"
                    src="https://skillicons.dev/icons?i=express&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Express</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">4/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="graphql"
                    src="https://skillicons.dev/icons?i=graphql&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">GraphQL</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">3/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="py"
                    src="https://skillicons.dev/icons?i=py&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Python</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">4/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="socketio"
                    src="https://skillicons.dev/icons?i=socketio&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">WebSockets</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">3/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
             </div>
           </div>
         </div>
@@ -449,28 +462,28 @@
                    src="https://skillicons.dev/icons?i=postgres&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">PostgreSQL</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">4/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="mongodb"
                    src="https://skillicons.dev/icons?i=mongodb&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">MongoDB</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">4/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="redis"
                    src="https://skillicons.dev/icons?i=redis&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Redis</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">3/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="prisma"
                    src="https://skillicons.dev/icons?i=prisma&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Prisma ORM</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">4/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
             </div>
           </div>
         </div>
@@ -485,42 +498,42 @@
                    src="https://skillicons.dev/icons?i=git&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Git</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">5/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="github"
                    src="https://skillicons.dev/icons?i=github&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">GitHub</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">5/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="docker"
                    src="https://skillicons.dev/icons?i=docker&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Docker</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">4/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="actions"
                    src="https://skillicons.dev/icons?i=actions&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">CI/CD</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">3/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="vercel"
                    src="https://skillicons.dev/icons?i=vercel&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Vercel</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">4/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
             </div>
             <div class="skill-row">
               <img class="skill-row-icon" data-icon="linux"
                    src="https://skillicons.dev/icons?i=linux&theme=light"
                    alt="" width="26" height="26" loading="lazy" />
               <span class="skill-row-name">Linux</span>
-              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="skill-proficiency-value">3/5</span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
             </div>
           </div>
         </div>
@@ -576,6 +589,28 @@
             <span class="tag">PostgreSQL</span>
             <span class="tag">Docker</span>
           </div>
+
+          <!--
+            KEY ACHIEVEMENTS — Level 4.1 addition
+            Collapsed by default; tapping the toggle reveals 2-3 concrete,
+            specific wins beyond the one-paragraph summary above. Same
+            0fr→1fr grid animation as the case study accordion, for the
+            same reason: no JS height-measuring needed.
+          -->
+          <button type="button" class="exp-toggle" aria-expanded="false">
+            <span class="exp-toggle-label">Key achievements</span>
+            <svg class="exp-toggle-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="exp-achievements-wrap">
+            <ul class="exp-achievements">
+              <li>Rebuilt the checkout flow, cutting cart-abandonment rate by 18%</li>
+              <li>Introduced a shared component library adopted across 3 internal teams</li>
+              <li>Mentored 2 junior developers through their first production deploys</li>
+            </ul>
+          </div>
         </article>
 
         <!-- JOB ENTRY 2 -->
@@ -596,6 +631,20 @@
             <span class="tag">TypeScript</span>
             <span class="tag">Tailwind</span>
           </div>
+
+          <button type="button" class="exp-toggle" aria-expanded="false">
+            <span class="exp-toggle-label">Key achievements</span>
+            <svg class="exp-toggle-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="exp-achievements-wrap">
+            <ul class="exp-achievements">
+              <li>Cut largest-contentful-paint time by 2.1s on the main marketing pages</li>
+              <li>Built a reusable design-token system shared with the design team</li>
+            </ul>
+          </div>
         </article>
 
         <!-- JOB ENTRY 3 -->
@@ -614,6 +663,20 @@
             <span class="tag">JavaScript</span>
             <span class="tag">Express</span>
             <span class="tag">MongoDB</span>
+          </div>
+
+          <button type="button" class="exp-toggle" aria-expanded="false">
+            <span class="exp-toggle-label">Key achievements</span>
+            <svg class="exp-toggle-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="exp-achievements-wrap">
+            <ul class="exp-achievements">
+              <li>Migrated the dashboard's legacy JS codebase to TypeScript with zero downtime</li>
+              <li>Wrote the team's first onboarding guide, now used for every new hire</li>
+            </ul>
           </div>
         </article>
 
@@ -695,16 +758,27 @@
               </div>
             </div>
 
-            <!-- Shown only when "Custom" is selected -->
+            <!--
+              Shown only when "Custom" is selected.
+              This used to be two <input type="month"> fields — those
+              have NO picker UI at all on mobile Safari (it just renders
+              as a plain text box with nothing to tap), which is exactly
+              why this felt broken. Native <select> dropdowns render a
+              proper tap-friendly picker on every mobile browser, so
+              that's what this is built from instead. Options are
+              populated by initContribGraph() in main.js.
+            -->
             <div class="contrib-custom-range" id="contribCustomRange" hidden>
-              <label>
-                From
-                <input type="month" id="contribFrom" />
-              </label>
-              <label>
-                To
-                <input type="month" id="contribTo" />
-              </label>
+              <div class="contrib-range-field">
+                <span class="contrib-range-label">From</span>
+                <select id="contribFromMonth" aria-label="From month"></select>
+                <select id="contribFromYear" aria-label="From year"></select>
+              </div>
+              <div class="contrib-range-field">
+                <span class="contrib-range-label">To</span>
+                <select id="contribToMonth" aria-label="To month"></select>
+                <select id="contribToYear" aria-label="To year"></select>
+              </div>
               <button type="button" class="btn-ghost contrib-apply" id="contribApply">Apply</button>
             </div>
 
@@ -853,10 +927,15 @@
             than a wall of text. See .cs-flow / .cs-step in style.css.
           -->
           <div class="case-study-content" data-project="alpha" hidden>
+            <div class="cs-progress" aria-hidden="true">
+              <span class="cs-progress-dot"></span>
+              <span class="cs-progress-dot"></span>
+              <span class="cs-progress-dot"></span>
+            </div>
             <div class="cs-flow">
-              <div class="cs-step">
+              <div class="cs-step cs-step--problem">
                 <button type="button" class="cs-step-header" aria-expanded="false">
-                  <span class="cs-step-num">1</span>
+                  <span class="cs-step-num"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
                   <h4 class="cs-step-title">The problem</h4>
                   <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -869,9 +948,9 @@
                   </div>
                 </div>
               </div>
-              <div class="cs-step">
+              <div class="cs-step cs-step--process">
                 <button type="button" class="cs-step-header" aria-expanded="false">
-                  <span class="cs-step-num">2</span>
+                  <span class="cs-step-num"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
                   <h4 class="cs-step-title">The process</h4>
                   <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -886,7 +965,7 @@
               </div>
               <div class="cs-step cs-step--result">
                 <button type="button" class="cs-step-header" aria-expanded="false">
-                  <span class="cs-step-num">✓</span>
+                  <span class="cs-step-num"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>
                   <h4 class="cs-step-title">The result</h4>
                   <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -937,10 +1016,15 @@
             </svg>
           </button>
           <div class="case-study-content" data-project="cli" hidden>
+            <div class="cs-progress" aria-hidden="true">
+              <span class="cs-progress-dot"></span>
+              <span class="cs-progress-dot"></span>
+              <span class="cs-progress-dot"></span>
+            </div>
             <div class="cs-flow">
-              <div class="cs-step">
+              <div class="cs-step cs-step--problem">
                 <button type="button" class="cs-step-header" aria-expanded="false">
-                  <span class="cs-step-num">1</span>
+                  <span class="cs-step-num"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
                   <h4 class="cs-step-title">The problem</h4>
                   <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -953,9 +1037,9 @@
                   </div>
                 </div>
               </div>
-              <div class="cs-step">
+              <div class="cs-step cs-step--process">
                 <button type="button" class="cs-step-header" aria-expanded="false">
-                  <span class="cs-step-num">2</span>
+                  <span class="cs-step-num"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
                   <h4 class="cs-step-title">The process</h4>
                   <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -970,7 +1054,7 @@
               </div>
               <div class="cs-step cs-step--result">
                 <button type="button" class="cs-step-header" aria-expanded="false">
-                  <span class="cs-step-num">✓</span>
+                  <span class="cs-step-num"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>
                   <h4 class="cs-step-title">The result</h4>
                   <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1023,10 +1107,15 @@
             </svg>
           </button>
           <div class="case-study-content" data-project="ecommerce" hidden>
+            <div class="cs-progress" aria-hidden="true">
+              <span class="cs-progress-dot"></span>
+              <span class="cs-progress-dot"></span>
+              <span class="cs-progress-dot"></span>
+            </div>
             <div class="cs-flow">
-              <div class="cs-step">
+              <div class="cs-step cs-step--problem">
                 <button type="button" class="cs-step-header" aria-expanded="false">
-                  <span class="cs-step-num">1</span>
+                  <span class="cs-step-num"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
                   <h4 class="cs-step-title">The problem</h4>
                   <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1039,9 +1128,9 @@
                   </div>
                 </div>
               </div>
-              <div class="cs-step">
+              <div class="cs-step cs-step--process">
                 <button type="button" class="cs-step-header" aria-expanded="false">
-                  <span class="cs-step-num">2</span>
+                  <span class="cs-step-num"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
                   <h4 class="cs-step-title">The process</h4>
                   <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1056,7 +1145,7 @@
               </div>
               <div class="cs-step cs-step--result">
                 <button type="button" class="cs-step-header" aria-expanded="false">
-                  <span class="cs-step-num">✓</span>
+                  <span class="cs-step-num"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>
                   <h4 class="cs-step-title">The result</h4>
                   <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

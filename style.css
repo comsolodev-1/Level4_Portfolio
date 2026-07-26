@@ -1009,6 +1009,43 @@ section {
   background-color: var(--white);
 }
 
+.skill-proficiency-value {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+  margin-left: 6px;
+}
+
+.skill-card--accent .skill-proficiency-value { color: var(--gray-500); }
+
+/* Legend shown once above the whole grid, explaining what the bars
+   mean — the numeric "N/5" labels next to each skill make individual
+   rows unambiguous, but a first-time visitor still needs this to know
+   what the bars are measuring at all. */
+.skills-legend {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.skills-legend-example {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 3px;
+}
+
+.skills-legend-example .prof-seg { width: 12px; height: 4px; border-radius: 2px; }
+
 /* Staggered entrance — each card gets a slightly later delay than the
    one before it, so the whole row cascades in left-to-right instead
    of popping in all at once as a single flat block. */
@@ -1253,6 +1290,70 @@ section {
   letter-spacing: 0.02em;
   border: 1px solid var(--border);
   white-space: nowrap;
+}
+
+/*
+  KEY ACHIEVEMENTS TOGGLE — Level 4.1 addition
+  Same 0fr→1fr collapse trick as the case study accordion (see .cs-step
+  in the modal styles) — a collapsed panel has zero usable height, an
+  open one gets its natural content height, and the transition between
+  them is smooth without any JS measuring scrollHeight.
+*/
+.exp-toggle {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 6px;
+  margin-top: 0.9rem;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.exp-toggle:hover { color: var(--text-primary); }
+
+.exp-toggle-chevron {
+  -webkit-transition: -webkit-transform 0.25s ease;
+          transition: transform 0.25s ease;
+}
+
+.exp-toggle[aria-expanded="true"] .exp-toggle-chevron {
+  -webkit-transform: rotate(180deg);
+      -ms-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+
+.exp-achievements-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  -webkit-transition: grid-template-rows 0.3s ease;
+          transition: grid-template-rows 0.3s ease;
+}
+
+.exp-item.achievements-open .exp-achievements-wrap {
+  grid-template-rows: 1fr;
+}
+
+.exp-achievements {
+  overflow: hidden;
+  min-height: 0;
+  padding-left: 1.1rem;
+  padding-top: 0.75rem;
+}
+
+.exp-achievements li {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-mid);
+  list-style: disc;
+  margin-bottom: 4px;
 }
 
 /* ────────────────────────────────────────────────
@@ -2417,11 +2518,45 @@ footer {
   border: 3px solid var(--surface); /* punches a clean gap in the line behind it */
 }
 
+.cs-step-num svg { display: block; }
+
+/* Distinct shade + icon per step type — same numbered-circle shape,
+   but progressively darker as you move through the flow, so the
+   sequence itself carries a bit of visual weight instead of every
+   step looking identical apart from its label. */
+.cs-step--problem .cs-step-num { background-color: var(--gray-500); }
+.cs-step--process .cs-step-num { background-color: var(--gray-700); }
+
 /* Result step's circle gets a soft ring so the "outcome" step reads as
    the payoff at a glance, without introducing an off-brand accent color */
 .cs-step--result .cs-step-num {
+  background-color: var(--gray-900);
   -webkit-box-shadow: 0 0 0 3px var(--border-soft);
           box-shadow: 0 0 0 3px var(--border-soft);
+}
+
+/* Progress dots — purely visual feedback for how far through the
+   Problem → Process → Result flow the reader has tapped. Updated by
+   updateCaseStudyProgress() in main.js every time a step is toggled. */
+.cs-progress {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1.1rem;
+}
+
+.cs-progress-dot {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background-color: var(--border);
+  -webkit-transition: background-color 0.25s ease;
+          transition: background-color 0.25s ease;
+}
+
+.cs-progress-dot.seen {
+  background-color: var(--gray-900);
 }
 
 .cs-flow .cs-step-title {
@@ -2657,13 +2792,13 @@ footer {
   -webkit-box-align: end;
       -ms-flex-align: end;
           align-items: flex-end;
-  gap: 0.75rem;
+  gap: 0.85rem;
   margin-bottom: 0.85rem;
   -ms-flex-wrap: wrap;
       flex-wrap: wrap;
 }
 
-.contrib-custom-range label {
+.contrib-range-field {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -2672,19 +2807,25 @@ footer {
       -ms-flex-direction: column;
           flex-direction: column;
   gap: 4px;
+}
+
+.contrib-range-label {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-faint);
 }
 
-.contrib-custom-range input[type="month"] {
+.contrib-range-field select {
   font-family: var(--font-sans);
   font-size: 13px;
   color: var(--text-primary);
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 6px 10px;
+  padding: 6px 8px;
+  margin-right: 4px;
+  /* Native appearance kept intentionally — that's what makes this a
+     real, tappable, OS-styled picker on mobile instead of a fake one. */
 }
 
 .contrib-apply {
