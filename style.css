@@ -322,6 +322,21 @@ nav::after {
           transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease !important;
 }
 
+/*
+  DARK MODE FIX — Level 4.2
+  This pill was hardcoded to var(--gray-900) (#18181b), which is the
+  exact same value dark mode uses for --surface / the nav backdrop —
+  so the "filled pill" button was nearly blending into its surroundings.
+  Inverted to a light pill in dark mode instead.
+*/
+[data-theme="dark"] .nav-cta {
+  background-color: var(--gray-100) !important;
+  color: var(--gray-900) !important;
+  background-image:
+    linear-gradient(var(--gray-100), var(--gray-100)),
+    linear-gradient(135deg, var(--gray-600) 0%, var(--white) 50%, var(--gray-600) 100%) !important;
+}
+
 .nav-cta:hover {
   -webkit-transform: translateY(-1px) !important;
       -ms-transform: translateY(-1px) !important;
@@ -786,6 +801,22 @@ section {
   -webkit-tap-highlight-color: transparent;
 }
 
+/*
+  DARK MODE FIX — Level 4.2
+  Same issue as .nav-cta: hardcoded var(--gray-900) matches --bg /
+  --surface almost exactly once dark mode flips, so this CTA button
+  barely registered against the page behind it. Inverted to a light
+  pill so it actually reads as "the button to press" in dark mode too.
+*/
+[data-theme="dark"] .btn-primary {
+  background-color: var(--gray-100);
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  background-color: var(--gray-300);
+}
+
 .btn-primary:hover {
   background-color: var(--gray-700);
   -webkit-transform: translateY(-1px);
@@ -1009,6 +1040,23 @@ section {
   background-color: var(--white);
 }
 
+/*
+  DARK MODE FIX — Level 4.2
+  .prof-seg.filled was hardcoded to var(--gray-900) (near-black),
+  which never flips with the theme. On the accent card that's fine —
+  it's a permanently dark card, so a dark segment was already wrong
+  and gets overridden right above. But on the other three cards
+  (Backend/Database/Tools), the card's own background also switches to
+  a dark surface in dark mode via var(--surface) — so a near-black
+  "filled" segment on a near-black card background just disappears.
+  .prof-seg itself (unfilled) already uses var(--border), a semantic
+  alias that flips correctly on its own — only the filled state needed
+  an explicit override here.
+*/
+[data-theme="dark"] .skill-card:not(.skill-card--accent) .prof-seg.filled {
+  background-color: var(--gray-100);
+}
+
 .skill-proficiency-value {
   -ms-flex-negative: 0;
       flex-shrink: 0;
@@ -1160,6 +1208,17 @@ section {
           transition: transform 0.25s ease;
 }
 
+/*
+  DARK MODE FIX — Level 4.2
+  Badge fill was hardcoded to var(--gray-900), nearly identical to
+  --bg (page background) in dark mode — the numbered circle on the
+  timeline was almost disappearing into the page behind it.
+*/
+[data-theme="dark"] .exp-badge {
+  background-color: var(--gray-100);
+  color: var(--gray-900);
+}
+
 .exp-item:hover .exp-badge {
   -webkit-transform: scale(1.12);
       -ms-transform: scale(1.12);
@@ -1205,6 +1264,12 @@ section {
   -ms-flex-negative: 0;
       flex-shrink: 0;
 }
+
+[data-theme="dark"] .exp-current-tag {
+  background-color: var(--gray-100);
+  color: var(--gray-900);
+}
+
 
 /* Staggered entrance, same cascading idea as the skills cards */
 .timeline .exp-item:nth-child(1) { transition: opacity 0.65s ease, transform 0.65s ease; }
@@ -1491,6 +1556,20 @@ section {
   background-clip: padding-box, border-box;
 }
 
+/*
+  DARK MODE FIX — Level 4.2
+  This card is styled var(--gray-900) specifically so it stands out as
+  "the dark featured card" among lighter siblings. But in dark mode,
+  --surface (the *regular* card background) is ALSO var(--gray-900) —
+  so the featured card and every plain sibling card become the exact
+  same color, and the whole "featured" distinction disappears. Using
+  the true --black here (darker than --surface) restores the contrast.
+*/
+[data-theme="dark"] .project-card--featured {
+  background-color: var(--black);
+}
+
+
 .project-card--featured:hover {
   -webkit-transform: translateY(-3px);
       -ms-transform: translateY(-3px);
@@ -1500,6 +1579,12 @@ section {
     linear-gradient(135deg, var(--white) 0%, var(--gray-400) 40%, var(--white) 70%, var(--gray-500) 100%);
   background-origin: border-box;
   background-clip: padding-box, border-box;
+}
+
+[data-theme="dark"] .project-card--featured:hover {
+  background-image:
+    linear-gradient(var(--black), var(--black)),
+    linear-gradient(135deg, var(--white) 0%, var(--gray-400) 40%, var(--white) 70%, var(--gray-500) 100%);
 }
 
 .project-header {
@@ -1830,6 +1915,21 @@ section {
       touch-action: manipulation;
 }
 
+/*
+  DARK MODE FIX — Level 4.2
+  Same var(--gray-900)-matches-dark-surface issue as the other CTA
+  buttons on this page. Inverted to a light pill in dark mode.
+*/
+[data-theme="dark"] .submit-btn {
+  background-color: var(--gray-100);
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .submit-btn:hover:not(:disabled) {
+  background-color: var(--gray-300);
+  box-shadow: 0 0 0 2px var(--gray-100), 0 0 0 3px var(--gray-500), 0 4px 16px rgba(0,0,0,0.4);
+}
+
 .submit-btn:hover:not(:disabled) {
   background-color: var(--gray-700);
   -webkit-transform: translateY(-1px);
@@ -1837,8 +1937,7 @@ section {
           transform: translateY(-1px);
   /* Subtle gradient glow ring on hover */
   -webkit-box-shadow: 0 0 0 2px var(--gray-900), 0 0 0 3px var(--gray-500), 0 4px 16px rgba(0,0,0,0.18);
-          box-shadow: 0 0 0 2px var(--gray-900), 0 0 0 3px var(--gray-500), 0 4px 16px rgba(0,0,0,0.18);
-}
+          box-shadow: 0 0 0 2px var(--gray-900), 0 0 0 3px var(--gray-500), 0 4px 16px rgba(0,0,0,0.18);}
 
 .submit-btn:active:not(:disabled) {
   -webkit-transform: translateY(0);
@@ -2535,6 +2634,29 @@ footer {
           box-shadow: 0 0 0 3px var(--border-soft);
 }
 
+/*
+  DARK MODE FIX — Level 4.2
+  Most severe version of this bug: .cs-step--result was var(--gray-900),
+  and the modal panel it sits on (.modal-panel) is var(--surface) —
+  which IS var(--gray-900) in dark mode. Same exact color as its own
+  background meant the circle was 100% invisible, not just low-contrast.
+  problem/process were lighter grays so they at least partially showed,
+  but all three get proper dark-mode values here, inverted so they get
+  progressively LIGHTER (instead of darker) through the flow — still
+  reads as "building up to the payoff", just flipped for a dark canvas.
+*/
+[data-theme="dark"] .cs-step--problem .cs-step-num {
+  background-color: var(--gray-600);
+}
+[data-theme="dark"] .cs-step--process .cs-step-num {
+  background-color: var(--gray-400);
+  color: var(--gray-900);
+}
+[data-theme="dark"] .cs-step--result .cs-step-num {
+  background-color: var(--gray-100);
+  color: var(--gray-900);
+}
+
 /* Progress dots — purely visual feedback for how far through the
    Problem → Process → Result flow the reader has tapped. Updated by
    updateCaseStudyProgress() in main.js every time a step is toggled. */
@@ -2557,6 +2679,16 @@ footer {
 
 .cs-progress-dot.seen {
   background-color: var(--gray-900);
+}
+
+/*
+  DARK MODE FIX — Level 4.2
+  Same exact-match issue as the step circles: .seen was var(--gray-900),
+  identical to the modal panel's --surface in dark mode, so "seen"
+  dots were indistinguishable from "not seen yet" ones.
+*/
+[data-theme="dark"] .cs-progress-dot.seen {
+  background-color: var(--gray-100);
 }
 
 .cs-flow .cs-step-title {
