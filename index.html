@@ -339,15 +339,17 @@
         popping in as a single flat block.
         skill-card--accent on the first card → dark/inverted for visual contrast.
 
-        TECH ICONS — Level 4 refactor
-        Each card's .skill-icons-img pulls a live-rendered row of real
-        brand logos from skillicons.dev (a free, no-signup icon-rendering
-        service — just an <img>, no API key, no backend). The &theme=
-        query param is swapped between "light"/"dark" by
-        updateThemedGithubAssets() in main.js whenever the site's
-        dark-mode toggle fires, so the icons always match the page.
-        data-icons holds the raw slug list so that function can rebuild
-        the URL without re-parsing the existing src.
+        TECH ICONS — Level 4.1 refinement
+        Was previously one combined icon-row image per card; now each
+        skill gets its own individual icon (still from skillicons.dev,
+        just one slug per request instead of a comma-joined row) paired
+        with a name and a 5-segment proficiency bar (.skill-proficiency).
+        syncSkillIcons() in main.js rebuilds each .skill-row-icon's src
+        when the theme toggles, using data-icon (+ data-fixed-theme on
+        the permanently-dark Frontend card).
+        Proficiency levels are self-assessed placeholders — edit the
+        number of "filled" .prof-seg spans per skill to your own honest
+        level (0–5) before publishing.
       -->
       <div class="skills-grid">
 
@@ -355,53 +357,172 @@
         <div class="skill-card skill-card--accent fade-in">
           <span class="skill-index" aria-hidden="true">01</span>
           <h3 class="skill-category">Frontend</h3>
-          <img class="skill-icons-img"
-               data-icons="react,nextjs,ts,tailwind,figma"
-               data-perline="5"
-               data-fixed-theme="dark"
-               src="https://skillicons.dev/icons?i=react,nextjs,ts,tailwind,figma&theme=dark&perline=5"
-               alt="Frontend stack: React, Next.js, TypeScript, Tailwind CSS, Figma"
-               width="250" height="50" loading="lazy" />
-          <p class="skill-caption">React · Next.js · TypeScript · Tailwind · Figma</p>
+          <div class="skill-rows">
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="react" data-fixed-theme="dark"
+                   src="https://skillicons.dev/icons?i=react&theme=dark"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">React</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="nextjs" data-fixed-theme="dark"
+                   src="https://skillicons.dev/icons?i=nextjs&theme=dark"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Next.js</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="ts" data-fixed-theme="dark"
+                   src="https://skillicons.dev/icons?i=ts&theme=dark"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">TypeScript</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="tailwind" data-fixed-theme="dark"
+                   src="https://skillicons.dev/icons?i=tailwind&theme=dark"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Tailwind CSS</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="figma" data-fixed-theme="dark"
+                   src="https://skillicons.dev/icons?i=figma&theme=dark"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Figma</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+            </div>
+          </div>
         </div>
 
         <!-- CARD 2: Backend -->
         <div class="skill-card fade-in">
           <span class="skill-index" aria-hidden="true">02</span>
           <h3 class="skill-category">Backend</h3>
-          <img class="skill-icons-img"
-               data-icons="nodejs,express,graphql,py,socketio"
-               data-perline="5"
-               src="https://skillicons.dev/icons?i=nodejs,express,graphql,py,socketio&theme=light&perline=5"
-               alt="Backend stack: Node.js, Express, GraphQL, Python, WebSockets"
-               width="250" height="50" loading="lazy" />
-          <p class="skill-caption">Node.js · Express · GraphQL · Python · WebSockets</p>
+          <div class="skill-rows">
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="nodejs"
+                   src="https://skillicons.dev/icons?i=nodejs&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Node.js</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="express"
+                   src="https://skillicons.dev/icons?i=express&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Express</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="graphql"
+                   src="https://skillicons.dev/icons?i=graphql&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">GraphQL</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="py"
+                   src="https://skillicons.dev/icons?i=py&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Python</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="socketio"
+                   src="https://skillicons.dev/icons?i=socketio&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">WebSockets</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+            </div>
+          </div>
         </div>
 
         <!-- CARD 3: Database -->
         <div class="skill-card fade-in">
           <span class="skill-index" aria-hidden="true">03</span>
           <h3 class="skill-category">Database</h3>
-          <img class="skill-icons-img"
-               data-icons="postgres,mongodb,redis,prisma"
-               data-perline="4"
-               src="https://skillicons.dev/icons?i=postgres,mongodb,redis,prisma&theme=light&perline=4"
-               alt="Database stack: PostgreSQL, MongoDB, Redis, Prisma ORM"
-               width="200" height="50" loading="lazy" />
-          <p class="skill-caption">PostgreSQL · MongoDB · Redis · Prisma</p>
+          <div class="skill-rows">
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="postgres"
+                   src="https://skillicons.dev/icons?i=postgres&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">PostgreSQL</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="mongodb"
+                   src="https://skillicons.dev/icons?i=mongodb&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">MongoDB</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="redis"
+                   src="https://skillicons.dev/icons?i=redis&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Redis</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="prisma"
+                   src="https://skillicons.dev/icons?i=prisma&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Prisma ORM</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+            </div>
+          </div>
         </div>
 
         <!-- CARD 4: Tools & DevOps -->
         <div class="skill-card fade-in">
           <span class="skill-index" aria-hidden="true">04</span>
           <h3 class="skill-category">Tools &amp; Ops</h3>
-          <img class="skill-icons-img"
-               data-icons="git,github,docker,actions,vercel,linux"
-               data-perline="4"
-               src="https://skillicons.dev/icons?i=git,github,docker,actions,vercel,linux&theme=light&perline=4"
-               alt="Tools: Git, GitHub, Docker, GitHub Actions, Vercel, Linux"
-               width="200" height="100" loading="lazy" />
-          <p class="skill-caption">Git · GitHub · Docker · CI/CD · Vercel · Linux</p>
+          <div class="skill-rows">
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="git"
+                   src="https://skillicons.dev/icons?i=git&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Git</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="github"
+                   src="https://skillicons.dev/icons?i=github&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">GitHub</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 5 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="docker"
+                   src="https://skillicons.dev/icons?i=docker&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Docker</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="actions"
+                   src="https://skillicons.dev/icons?i=actions&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">CI/CD</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="vercel"
+                   src="https://skillicons.dev/icons?i=vercel&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Vercel</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 4 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span></span>
+            </div>
+            <div class="skill-row">
+              <img class="skill-row-icon" data-icon="linux"
+                   src="https://skillicons.dev/icons?i=linux&theme=light"
+                   alt="" width="26" height="26" loading="lazy" />
+              <span class="skill-row-name">Linux</span>
+              <span class="skill-proficiency" aria-label="Proficiency: 3 out of 5"><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg filled"></span><span class="prof-seg"></span><span class="prof-seg"></span></span>
+            </div>
+          </div>
         </div>
 
       </div><!-- /skills-grid -->
@@ -546,23 +667,60 @@
           </div>
 
           <!--
-            CONTRIBUTION GRAPH — Level 4 addition, the centerpiece of this
-            section now (more telling than raw follower/repo counts).
-            Rendered by ghchart.rshah.org — a free, no-signup image service
-            that draws the same 52-week activity calendar GitHub shows on
-            profiles, from just a username in the URL. It's a plain <img>,
-            so there's no API call to manage on our end; we just handle
-            the load/error events for a skeleton + graceful fallback.
-            initGithubStats() sets the real src and swaps its color to
-            match light/dark mode.
+            CONTRIBUTION GRAPH — Level 4.1 refinement
+            Was previously a static <img> from ghchart.rshah.org, but that
+            service only ever renders a fixed "last 12 months" image — no
+            way to narrow the range. Replaced with a custom-built calendar:
+            we fetch raw daily contribution counts as JSON from
+            github-contributions-api.jogruber.de (a free, public, no-auth
+            mirror of GitHub's contribution data — GitHub's own official
+            API only exposes this via authenticated GraphQL, which isn't
+            safe to call from a static client-side site), then render our
+            own grid of day-cells and filter it entirely in the browser.
+            See initContribGraph() / renderContribGrid() in main.js.
           -->
           <div class="github-contrib">
-            <p class="github-contrib-label">Contribution activity (last 12 months)</p>
+            <div class="contrib-header">
+              <p class="github-contrib-label">Contribution activity</p>
+              <!--
+                Range filter — purely a client-side re-render, no new
+                network request. "range" values are in months, "custom"
+                reveals the two <input type="month"> pickers below.
+              -->
+              <div class="contrib-filters" role="group" aria-label="Filter contribution range">
+                <button class="contrib-filter-pill" data-range="3">3M</button>
+                <button class="contrib-filter-pill active" data-range="6">6M</button>
+                <button class="contrib-filter-pill" data-range="12">12M</button>
+                <button class="contrib-filter-pill" data-range="custom">Custom</button>
+              </div>
+            </div>
+
+            <!-- Shown only when "Custom" is selected -->
+            <div class="contrib-custom-range" id="contribCustomRange" hidden>
+              <label>
+                From
+                <input type="month" id="contribFrom" />
+              </label>
+              <label>
+                To
+                <input type="month" id="contribTo" />
+              </label>
+              <button type="button" class="btn-ghost contrib-apply" id="contribApply">Apply</button>
+            </div>
+
             <div class="github-contrib-wrap">
               <div class="gh-skel gh-skel--contrib" id="githubContribSkeleton"></div>
-              <img class="github-contrib-img" id="githubContribImg"
-                   alt="GitHub contribution calendar" hidden />
+              <div class="contrib-calendar" id="contribCalendar" hidden>
+                <div class="contrib-months" id="contribMonths"></div>
+                <div class="contrib-grid" id="contribGrid"></div>
+              </div>
             </div>
+
+            <!-- Updates on every filter change; also shows the currently
+                 tapped/hovered day's exact count (mobile has no hover, so
+                 tapping a cell is how this actually gets read on a phone) -->
+            <p class="contrib-summary" id="contribSummary" hidden></p>
+
             <p class="github-contrib-fallback" id="githubContribFallback" hidden>
               Live contribution graph is unavailable right now —
               <a id="githubContribFallbackLink" href="#" target="_blank" rel="noopener">view it on GitHub</a>.
@@ -697,24 +855,48 @@
           <div class="case-study-content" data-project="alpha" hidden>
             <div class="cs-flow">
               <div class="cs-step">
-                <span class="cs-step-num">1</span>
-                <div class="cs-step-body">
-                  <h4>The problem</h4>
-                  <p>The client was running billing and usage tracking through a patchwork of spreadsheets and a third-party dashboard that didn't talk to their own database, so support tickets about incorrect invoices were a weekly occurrence.</p>
+                <button type="button" class="cs-step-header" aria-expanded="false">
+                  <span class="cs-step-num">1</span>
+                  <h4 class="cs-step-title">The problem</h4>
+                  <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+                <div class="cs-step-panel-wrap">
+                  <div class="cs-step-panel-inner">
+                    <p>The client was running billing and usage tracking through a patchwork of spreadsheets and a third-party dashboard that didn't talk to their own database, so support tickets about incorrect invoices were a weekly occurrence.</p>
+                  </div>
                 </div>
               </div>
               <div class="cs-step">
-                <span class="cs-step-num">2</span>
-                <div class="cs-step-body">
-                  <h4>The process</h4>
-                  <p>Designed a Postgres schema that treated usage events as the source of truth, then layered Stripe's metered billing on top so invoices generate directly from real usage instead of a manually maintained count. Built the dashboard in Next.js with server components for the data-heavy views to keep first load fast.</p>
+                <button type="button" class="cs-step-header" aria-expanded="false">
+                  <span class="cs-step-num">2</span>
+                  <h4 class="cs-step-title">The process</h4>
+                  <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+                <div class="cs-step-panel-wrap">
+                  <div class="cs-step-panel-inner">
+                    <p>Designed a Postgres schema that treated usage events as the source of truth, then layered Stripe's metered billing on top so invoices generate directly from real usage instead of a manually maintained count. Built the dashboard in Next.js with server components for the data-heavy views to keep first load fast.</p>
+                  </div>
                 </div>
               </div>
               <div class="cs-step cs-step--result">
-                <span class="cs-step-num">✓</span>
-                <div class="cs-step-body">
-                  <h4>The result</h4>
-                  <p>Billing-related support tickets dropped to near zero after launch, and the client could finally see real-time usage per customer instead of waiting on end-of-month exports.</p>
+                <button type="button" class="cs-step-header" aria-expanded="false">
+                  <span class="cs-step-num">✓</span>
+                  <h4 class="cs-step-title">The result</h4>
+                  <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+                <div class="cs-step-panel-wrap">
+                  <div class="cs-step-panel-inner">
+                    <p>Billing-related support tickets dropped to near zero after launch, and the client could finally see real-time usage per customer instead of waiting on end-of-month exports.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -757,24 +939,48 @@
           <div class="case-study-content" data-project="cli" hidden>
             <div class="cs-flow">
               <div class="cs-step">
-                <span class="cs-step-num">1</span>
-                <div class="cs-step-body">
-                  <h4>The problem</h4>
-                  <p>Every project on the team hand-wrote TypeScript interfaces for API responses, and they'd silently go stale the moment the backend changed a field — bugs that only showed up at runtime.</p>
+                <button type="button" class="cs-step-header" aria-expanded="false">
+                  <span class="cs-step-num">1</span>
+                  <h4 class="cs-step-title">The problem</h4>
+                  <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+                <div class="cs-step-panel-wrap">
+                  <div class="cs-step-panel-inner">
+                    <p>Every project on the team hand-wrote TypeScript interfaces for API responses, and they'd silently go stale the moment the backend changed a field — bugs that only showed up at runtime.</p>
+                  </div>
                 </div>
               </div>
               <div class="cs-step">
-                <span class="cs-step-num">2</span>
-                <div class="cs-step-body">
-                  <h4>The process</h4>
-                  <p>Built a CLI that hits a given endpoint, infers the shape of the JSON response, and generates matching TypeScript types automatically, with a watch mode for local development. Published it as an open-source npm package with a small, dependency-light core so it'd be easy for other maintainers to audit.</p>
+                <button type="button" class="cs-step-header" aria-expanded="false">
+                  <span class="cs-step-num">2</span>
+                  <h4 class="cs-step-title">The process</h4>
+                  <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+                <div class="cs-step-panel-wrap">
+                  <div class="cs-step-panel-inner">
+                    <p>Built a CLI that hits a given endpoint, infers the shape of the JSON response, and generates matching TypeScript types automatically, with a watch mode for local development. Published it as an open-source npm package with a small, dependency-light core so it'd be easy for other maintainers to audit.</p>
+                  </div>
                 </div>
               </div>
               <div class="cs-step cs-step--result">
-                <span class="cs-step-num">✓</span>
-                <div class="cs-step-body">
-                  <h4>The result</h4>
-                  <p>Picked up 400+ GitHub stars in its first month and got adopted by a couple of other teams outside the original project, without any marketing beyond a single Show HN-style post.</p>
+                <button type="button" class="cs-step-header" aria-expanded="false">
+                  <span class="cs-step-num">✓</span>
+                  <h4 class="cs-step-title">The result</h4>
+                  <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+                <div class="cs-step-panel-wrap">
+                  <div class="cs-step-panel-inner">
+                    <p>Picked up 400+ GitHub stars in its first month and got adopted by a couple of other teams outside the original project, without any marketing beyond a single Show HN-style post.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -819,24 +1025,48 @@
           <div class="case-study-content" data-project="ecommerce" hidden>
             <div class="cs-flow">
               <div class="cs-step">
-                <span class="cs-step-num">1</span>
-                <div class="cs-step-body">
-                  <h4>The problem</h4>
-                  <p>The client's existing store was locked into a template-based platform that couldn't support the custom product configurator their catalog needed, and every content change required a developer.</p>
+                <button type="button" class="cs-step-header" aria-expanded="false">
+                  <span class="cs-step-num">1</span>
+                  <h4 class="cs-step-title">The problem</h4>
+                  <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+                <div class="cs-step-panel-wrap">
+                  <div class="cs-step-panel-inner">
+                    <p>The client's existing store was locked into a template-based platform that couldn't support the custom product configurator their catalog needed, and every content change required a developer.</p>
+                  </div>
                 </div>
               </div>
               <div class="cs-step">
-                <span class="cs-step-num">2</span>
-                <div class="cs-step-body">
-                  <h4>The process</h4>
-                  <p>Went headless: React storefront on the frontend, Sanity as the content layer so the client's team could edit products and pages themselves, and Stripe handling payments and subscription billing for a recurring-order option. Paid particular attention to checkout performance since that's where drop-off actually costs revenue.</p>
+                <button type="button" class="cs-step-header" aria-expanded="false">
+                  <span class="cs-step-num">2</span>
+                  <h4 class="cs-step-title">The process</h4>
+                  <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+                <div class="cs-step-panel-wrap">
+                  <div class="cs-step-panel-inner">
+                    <p>Went headless: React storefront on the frontend, Sanity as the content layer so the client's team could edit products and pages themselves, and Stripe handling payments and subscription billing for a recurring-order option. Paid particular attention to checkout performance since that's where drop-off actually costs revenue.</p>
+                  </div>
                 </div>
               </div>
               <div class="cs-step cs-step--result">
-                <span class="cs-step-num">✓</span>
-                <div class="cs-step-body">
-                  <h4>The result</h4>
-                  <p>The store now handles 500+ orders per day, and the client's own team ships content and product changes without opening a ticket.</p>
+                <button type="button" class="cs-step-header" aria-expanded="false">
+                  <span class="cs-step-num">✓</span>
+                  <h4 class="cs-step-title">The result</h4>
+                  <svg class="cs-step-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+                <div class="cs-step-panel-wrap">
+                  <div class="cs-step-panel-inner">
+                    <p>The store now handles 500+ orders per day, and the client's own team ships content and product changes without opening a ticket.</p>
+                  </div>
                 </div>
               </div>
             </div>

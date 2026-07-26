@@ -438,11 +438,12 @@ function initThemeToggle() {
       root.removeAttribute('data-theme'); // absence of the attribute = light (default CSS)
     }
     toggle.setAttribute('aria-pressed', String(theme === 'dark'));
-    // Keep the skillicons.dev rows and GitHub contribution graph in sync —
-    // those are plain <img> tags, so "theme" for them just means swapping
-    // a query-string param and re-requesting the image.
+    // The skillicons.dev logo rows are plain <img> tags pointed at a
+    // theme-aware URL, so they need an explicit re-sync on toggle.
+    // The contribution grid, by contrast, is now custom-built with plain
+    // CSS classes (see .contrib-cell.lvl-* in style.css) that already
+    // respond to [data-theme] automatically — nothing to sync here.
     syncSkillIcons();
-    syncGithubContribGraph();
   }
 }
 
@@ -669,6 +670,13 @@ function initCommandPalette() {
    #caseStudyBody and shows the modal. Keeping the content inline in
    each project card (rather than a separate JS data object) means
    editing a case study is just editing HTML, no JS knowledge needed.
+
+   Level 4.1: the injected content is now an accordion (see .cs-step
+   in style.css) — Problem/Process/Result stay collapsed until tapped,
+   rather than all showing at once. Because bodyEl.innerHTML is
+   replaced fresh on every open(), the accordion click listeners have
+   to be re-attached each time too — old listeners die with the old
+   DOM nodes they were bound to.
    ═══════════════════════════════════════════════════════════════ */
 function initCaseStudyModal() {
   const overlay = document.getElementById('caseStudyOverlay');
@@ -687,6 +695,7 @@ function initCaseStudyModal() {
 
     titleEl.textContent = card?.querySelector('.project-title')?.textContent || 'Case study';
     bodyEl.innerHTML = source.innerHTML;
+    initStepAccordion(bodyEl);
     overlay.hidden = false;
     document.body.style.overflow = 'hidden';
     requestAnimationFrame(() => closeBtn.focus());
@@ -695,6 +704,30 @@ function initCaseStudyModal() {
   function close() {
     overlay.hidden = true;
     document.body.style.overflow = '';
+  }
+
+  // Wires up the Problem/Process/Result accordion inside whatever
+  // content was just injected. First step opens by default (so the
+  // modal doesn't look empty the instant it appears); the rest start
+  // collapsed and wait for a tap.
+  function initStepAccordion(scope) {
+    const steps = scope.querySelectorAll('.cs-step');
+
+    steps.forEach((step, index) => {
+      const header = step.querySelector('.cs-step-header');
+      if (!header) return;
+
+      setStepOpen(step, header, index === 0);
+
+      header.addEventListener('click', () => {
+        setStepOpen(step, header, !step.classList.contains('open'));
+      });
+    });
+  }
+
+  function setStepOpen(step, header, shouldOpen) {
+    step.classList.toggle('open', shouldOpen);
+    header.setAttribute('aria-expanded', String(shouldOpen));
   }
 
   buttons.forEach(btn => {
@@ -714,12 +747,14 @@ function initCaseStudyModal() {
 /* ═══════════════════════════════════════════════════════════════
    LEVEL 4 — THEMED MEDIA HELPERS
    ───────────────────────────────────────────────────────────────
-   Two small helpers shared by initThemeToggle() and initGithubStats().
-   Both the skillicons.dev logo rows and the ghchart.rshah.org
-   contribution graph are just <img> tags pointed at services that
-   accept a color/theme in the query string — so "supporting dark
-   mode" for them means rebuilding that URL, not writing any real
-   theme-switching logic.
+   Shared by initThemeToggle() and initGithubStats(). The skillicons.dev
+   logo rows are <img> tags pointed at a service that accepts a
+   color/theme in the query string — so "supporting dark mode" for them
+   means rebuilding that URL, not writing any real theme-switching logic.
+   (The contribution grid used to work the same way via ghchart.rshah.org,
+   but is now custom-built — see renderContribGrid() below — and its
+   dark-mode support lives entirely in style.css's .contrib-cell.lvl-*
+   rules instead.)
    ═══════════════════════════════════════════════════════════════ */
 
 function currentSiteTheme() {
@@ -729,28 +764,15 @@ function currentSiteTheme() {
 function syncSkillIcons() {
   const theme = currentSiteTheme();
 
-  document.querySelectorAll('.skill-icons-img').forEach(img => {
-    const icons = img.dataset.icons;
-    if (!icons) return;
-    const perline = img.dataset.perline || 5;
+  document.querySelectorAll('.skill-row-icon').forEach(img => {
+    const icon = img.dataset.icon;
+    if (!icon) return;
     // data-fixed-theme (set on the Frontend card, which has a permanently
     // dark background) always wins over the page's current theme —
     // otherwise light-mode icons would go near-invisible on that card.
     const useTheme = img.dataset.fixedTheme || theme;
-    img.src = `https://skillicons.dev/icons?i=${icons}&theme=${useTheme}&perline=${perline}`;
+    img.src = `https://skillicons.dev/icons?i=${icon}&theme=${useTheme}`;
   });
-}
-
-function syncGithubContribGraph() {
-  const img = document.getElementById('githubContribImg');
-  if (!img) return;
-
-  const theme = currentSiteTheme();
-  // ghchart takes a single hex color and renders the whole calendar in
-  // shades of it. Light gray reads clearly on the dark surface, dark
-  // gray reads clearly on the light one.
-  const color = theme === 'dark' ? 'e4e4e7' : '18181b';
-  img.src = `https://ghchart.rshah.org/${color}/${GITHUB_USERNAME}`;
 }
 
 
@@ -779,34 +801,9 @@ function initGithubStats() {
 
   errorLink.href = `https://github.com/${GITHUB_USERNAME}`;
 
-  // ── Contribution graph wiring ──
-  // Attach the load/error handlers BEFORE the src is (re)assigned by
-  // applyThemedMedia() below — safe here because image loading is always
-  // asynchronous (queued as its own task), so nothing can fire before
-  // this synchronous DOMContentLoaded callback finishes running.
-  const contribImg      = document.getElementById('githubContribImg');
-  const contribSkeleton = document.getElementById('githubContribSkeleton');
-  const contribFallback = document.getElementById('githubContribFallback');
-  const contribFallbackLink = document.getElementById('githubContribFallbackLink');
-
-  if (contribImg) {
-    contribFallbackLink.href = `https://github.com/${GITHUB_USERNAME}`;
-
-    contribImg.addEventListener('load', () => {
-      contribSkeleton.style.display = 'none';
-      contribImg.hidden = false;
-    });
-
-    contribImg.addEventListener('error', () => {
-      contribSkeleton.style.display = 'none';
-      contribImg.hidden = true;
-      contribFallback.hidden = false;
-    });
-
-    // Kicks off the actual request using whatever theme is currently
-    // active (applyThemedMedia also re-runs this on every toggle click).
-    syncGithubContribGraph();
-  }
+  // Contribution calendar is a separate, self-contained feature —
+  // see initContribGraph() further down.
+  initContribGraph();
 
   Promise.all([
     fetch(`https://api.github.com/users/${GITHUB_USERNAME}`).then(r => {
@@ -876,6 +873,207 @@ function initGithubStats() {
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LEVEL 4.1 — CONTRIBUTION CALENDAR (custom-built, filterable)
+   ───────────────────────────────────────────────────────────────
+   One fetch gets a full year of daily contribution counts as JSON
+   from github-contributions-api.jogruber.de (a free, public mirror —
+   GitHub's own official contribution calendar is only available via
+   authenticated GraphQL, which a static client-side site can't call
+   safely). Everything after that — the 3M/6M/12M/custom filtering,
+   the grid, the month labels — is done entirely in the browser with
+   zero extra network requests, since we already have the full year
+   of data sitting in memory.
+   ═══════════════════════════════════════════════════════════════ */
+function initContribGraph() {
+  const skeleton   = document.getElementById('githubContribSkeleton');
+  const calendar   = document.getElementById('contribCalendar');
+  const gridEl     = document.getElementById('contribGrid');
+  const monthsEl   = document.getElementById('contribMonths');
+  const summaryEl  = document.getElementById('contribSummary');
+  const fallback   = document.getElementById('githubContribFallback');
+  const fallbackLink = document.getElementById('githubContribFallbackLink');
+  const filterPills = document.querySelectorAll('.contrib-filter-pill');
+  const customRow  = document.getElementById('contribCustomRange');
+  const customFrom = document.getElementById('contribFrom');
+  const customTo   = document.getElementById('contribTo');
+  const customApply = document.getElementById('contribApply');
+
+  if (!gridEl) return;
+
+  fallbackLink.href = `https://github.com/${GITHUB_USERNAME}`;
+
+  const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let contributions = []; // populated once the fetch resolves, then reused by every re-render
+
+  fetch(`https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}?y=last`)
+    .then(r => {
+      if (!r.ok) throw new Error('contributions fetch failed');
+      return r.json();
+    })
+    .then(data => {
+      contributions = Array.isArray(data.contributions) ? data.contributions : [];
+      skeleton.style.display = 'none';
+      calendar.hidden = false;
+
+      // Default view on load: 6 months
+      render(6);
+
+      // Pre-fill the custom-range pickers with a sensible default
+      // (this year's Jan → current month) so they're not empty if
+      // someone opens "Custom" without picking dates first.
+      const now = new Date();
+      customTo.value = monthInputValue(now);
+      const sixAgo = new Date(now);
+      sixAgo.setMonth(sixAgo.getMonth() - 6);
+      customFrom.value = monthInputValue(sixAgo);
+    })
+    .catch(() => {
+      skeleton.style.display = 'none';
+      fallback.hidden = false;
+    });
+
+  // ── Filter pill clicks ──
+  filterPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      filterPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+
+      const range = pill.dataset.range;
+      if (range === 'custom') {
+        customRow.hidden = false;
+      } else {
+        customRow.hidden = true;
+        render(parseInt(range, 10));
+      }
+    });
+  });
+
+  customApply.addEventListener('click', () => {
+    if (!customFrom.value || !customTo.value) return;
+    render(null, customFrom.value, customTo.value);
+  });
+
+  /**
+   * Renders the grid for either:
+   *   - the last `months` months (rolling from today), or
+   *   - an explicit `fromMonthValue` → `toMonthValue` range
+   *     (values are "YYYY-MM", straight from <input type="month">)
+   */
+  function render(months, fromMonthValue, toMonthValue) {
+    if (!contributions.length) return;
+
+    let startDate, endDate;
+
+    if (fromMonthValue && toMonthValue) {
+      startDate = new Date(`${fromMonthValue}-01T00:00:00`);
+      // End at the last day of the "to" month
+      endDate = new Date(`${toMonthValue}-01T00:00:00`);
+      endDate.setMonth(endDate.getMonth() + 1);
+      endDate.setDate(endDate.getDate() - 1);
+    } else {
+      endDate = new Date();
+      startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - months);
+    }
+
+    const filtered = contributions.filter(d => {
+      const t = new Date(d.date).getTime();
+      return t >= startDate.getTime() && t <= endDate.getTime();
+    });
+
+    if (!filtered.length) {
+      gridEl.innerHTML = '';
+      monthsEl.innerHTML = '';
+      summaryEl.textContent = 'No contribution data for this range.';
+      summaryEl.hidden = false;
+      return;
+    }
+
+    // Group into calendar weeks (Sun–Sat), padding the first week so
+    // day-of-week alignment matches a real calendar rather than just
+    // chunking every 7 items.
+    const weeks = [];
+    let week = [];
+    const firstWeekday = new Date(filtered[0].date).getDay();
+    for (let i = 0; i < firstWeekday; i++) week.push(null);
+
+    filtered.forEach(day => {
+      week.push(day);
+      if (week.length === 7) { weeks.push(week); week = []; }
+    });
+    if (week.length) {
+      while (week.length < 7) week.push(null);
+      weeks.push(week);
+    }
+
+    // Day cells
+    gridEl.innerHTML = weeks.map(w =>
+      w.map(day => {
+        if (!day) return `<span class="contrib-cell contrib-cell--empty"></span>`;
+        const level = day.level ?? levelFromCount(day.count);
+        const label = `${day.count} contribution${day.count === 1 ? '' : 's'} on ${formatDate(day.date)}`;
+        return `<button type="button" class="contrib-cell lvl-${level}" data-date="${day.date}" data-count="${day.count}" aria-label="${label}"></button>`;
+      }).join('')
+    ).join('');
+
+    // Month labels — one per week-column, only drawn where the month
+    // actually changes so labels don't repeat every single week.
+    let lastMonth = null;
+    monthsEl.innerHTML = weeks.map(w => {
+      const firstDay = w.find(d => d);
+      const month = firstDay ? new Date(firstDay.date).getMonth() : lastMonth;
+      if (firstDay && month !== lastMonth) {
+        lastMonth = month;
+        return `<span class="contrib-month-label">${MONTH_ABBR[month]}</span>`;
+      }
+      return `<span class="contrib-month-label"></span>`;
+    }).join('');
+
+    // Tapping/clicking a cell surfaces its exact count in the summary
+    // line — the main way this is readable at all on mobile, since
+    // there's no hover to rely on for the native title tooltip there.
+    gridEl.querySelectorAll('.contrib-cell:not(.contrib-cell--empty)').forEach(cell => {
+      cell.addEventListener('click', () => {
+        const count = cell.dataset.count;
+        const date = formatDate(cell.dataset.date);
+        summaryEl.textContent = `${count} contribution${count === '1' ? '' : 's'} on ${date}`;
+      });
+    });
+
+    const total = filtered.reduce((sum, d) => sum + d.count, 0);
+    const rangeLabel = fromMonthValue
+      ? `${formatMonthInput(fromMonthValue)} – ${formatMonthInput(toMonthValue)}`
+      : `the last ${months} month${months === 1 ? '' : 's'}`;
+    summaryEl.textContent = `${total} contribution${total === 1 ? '' : 's'} in ${rangeLabel}`;
+    summaryEl.hidden = false;
+  }
+
+  function levelFromCount(count) {
+    if (count === 0) return 0;
+    if (count <= 2) return 1;
+    if (count <= 5) return 2;
+    if (count <= 9) return 3;
+    return 4;
+  }
+
+  function formatDate(isoDate) {
+    return new Date(`${isoDate}T00:00:00`).toLocaleDateString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric'
+    });
+  }
+
+  function formatMonthInput(monthValue) {
+    const [y, m] = monthValue.split('-');
+    return `${MONTH_ABBR[parseInt(m, 10) - 1]} ${y}`;
+  }
+
+  function monthInputValue(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   }
 }
 
