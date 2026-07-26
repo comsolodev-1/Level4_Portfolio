@@ -759,27 +759,44 @@
             </div>
 
             <!--
-              Shown only when "Custom" is selected.
-              This used to be two <input type="month"> fields — those
-              have NO picker UI at all on mobile Safari (it just renders
-              as a plain text box with nothing to tap), which is exactly
-              why this felt broken. Native <select> dropdowns render a
-              proper tap-friendly picker on every mobile browser, so
-              that's what this is built from instead. Options are
-              populated by initContribGraph() in main.js.
+              Shown only when "Custom" is selected. Two buttons, each
+              opening the same popover calendar below — tap "From" or
+              "To", pick a month off the grid, done. (This replaced an
+              earlier version using <select> dropdowns, which worked
+              but wasn't the "tap a button, a calendar opens" picker
+              feel being asked for.)
             -->
             <div class="contrib-custom-range" id="contribCustomRange" hidden>
-              <div class="contrib-range-field">
-                <span class="contrib-range-label">From</span>
-                <select id="contribFromMonth" aria-label="From month"></select>
-                <select id="contribFromYear" aria-label="From year"></select>
+              <div class="contrib-range-fields-row">
+                <div class="contrib-range-field">
+                  <span class="contrib-range-label">From</span>
+                  <button type="button" class="contrib-month-btn" id="contribFromBtn"></button>
+                </div>
+                <div class="contrib-range-field">
+                  <span class="contrib-range-label">To</span>
+                  <button type="button" class="contrib-month-btn" id="contribToBtn"></button>
+                </div>
+                <button type="button" class="btn-ghost contrib-apply" id="contribApply">Apply</button>
               </div>
-              <div class="contrib-range-field">
-                <span class="contrib-range-label">To</span>
-                <select id="contribToMonth" aria-label="To month"></select>
-                <select id="contribToYear" aria-label="To year"></select>
+
+              <!--
+                Shared popover — whichever button (From/To) was tapped
+                sets initContribGraph()'s `activeField` in main.js, and
+                this same panel is reused for both rather than having
+                two separate calendars in the DOM.
+              -->
+              <div class="contrib-month-popover" id="contribMonthPopover" hidden>
+                <div class="contrib-month-popover-header">
+                  <button type="button" class="contrib-month-nav" id="contribYearPrev" aria-label="Previous year">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                  </button>
+                  <span class="contrib-month-popover-year" id="contribPopoverYear"></span>
+                  <button type="button" class="contrib-month-nav" id="contribYearNext" aria-label="Next year">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                  </button>
+                </div>
+                <div class="contrib-month-popover-grid" id="contribPopoverGrid"></div>
               </div>
-              <button type="button" class="btn-ghost contrib-apply" id="contribApply">Apply</button>
             </div>
 
             <div class="github-contrib-wrap">

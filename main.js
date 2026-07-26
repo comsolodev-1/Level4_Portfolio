@@ -926,11 +926,14 @@ function initContribGraph() {
   const fallbackLink = document.getElementById('githubContribFallbackLink');
   const filterPills = document.querySelectorAll('.contrib-filter-pill');
   const customRow  = document.getElementById('contribCustomRange');
-  const fromMonthSel = document.getElementById('contribFromMonth');
-  const fromYearSel  = document.getElementById('contribFromYear');
-  const toMonthSel   = document.getElementById('contribToMonth');
-  const toYearSel    = document.getElementById('contribToYear');
+  const fromBtn    = document.getElementById('contribFromBtn');
+  const toBtn      = document.getElementById('contribToBtn');
   const customApply = document.getElementById('contribApply');
+  const popover    = document.getElementById('contribMonthPopover');
+  const popoverYearLabel = document.getElementById('contribPopoverYear');
+  const popoverGrid = document.getElementById('contribPopoverGrid');
+  const yearPrevBtn = document.getElementById('contribYearPrev');
+  const yearNextBtn = document.getElementById('contribYearNext');
 
   if (!gridEl) return;
 
@@ -939,11 +942,15 @@ function initContribGraph() {
   const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   let contributions = []; // populated once the fetch resolves, then reused by every re-render
 
-  // Build the month/year <select> options once, up front. Years only
-  // need to span what the API actually gives us (a trailing 12 months,
-  // so at most two calendar years) — no point offering a 10-year range
-  // when there's no data behind most of it.
-  populateMonthYearSelects();
+  // ── Custom-range picker state ──
+  const today = new Date();
+  let fromValue = { month: today.getMonth() + 1, year: today.getFullYear() };
+  let toValue   = { month: today.getMonth() + 1, year: today.getFullYear() };
+  let activeField = null;    // 'from' | 'to' | null (which button opened the popover)
+  let popoverYear = today.getFullYear(); // year currently shown in the open popover
+  let minYear, maxYear;      // clamped once contributions data has loaded
+
+  updateTriggerLabels();
 
   fetch(`https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}?y=last`)
     .then(r => {
@@ -958,16 +965,20 @@ function initContribGraph() {
       // Default view on load: 6 months
       render(6);
 
-      // Pre-set the custom-range selects to a sensible default (6
-      // months ago → this month) so Apply works even if the visitor
-      // never touches the dropdowns themselves.
-      const now = new Date();
-      setSelectValue(toMonthSel, now.getMonth() + 1);
-      setSelectValue(toYearSel, now.getFullYear());
-      const sixAgo = new Date(now);
+      // Pre-set the custom-range picker to a sensible default (6 months
+      // ago → this month) so Apply works even before either button is touched.
+      const sixAgo = new Date(today);
       sixAgo.setMonth(sixAgo.getMonth() - 6);
-      setSelectValue(fromMonthSel, sixAgo.getMonth() + 1);
-      setSelectValue(fromYearSel, sixAgo.getFullYear());
+      fromValue = { month: sixAgo.getMonth() + 1, year: sixAgo.getFullYear() };
+      toValue   = { month: today.getMonth() + 1, year: today.getFullYear() };
+      updateTriggerLabels();
+
+      // Clamp the popover's year navigation to whatever range the fetched
+      // data actually covers, so people can't page to a year with nothing in it.
+      if (contributions.length) {
+        minYear = new Date(contributions[0].date).getFullYear();
+        maxYear = new Date(contributions[contributions.length - 1].date).getFullYear();
+      }
     })
     .catch(() => {
       skeleton.style.display = 'none';
@@ -985,33 +996,104 @@ function initContribGraph() {
         customRow.hidden = false;
       } else {
         customRow.hidden = true;
+        closePopover();
         render(parseInt(range, 10));
       }
     });
   });
 
   customApply.addEventListener('click', () => {
-    const fromValue = `${fromYearSel.value}-${String(fromMonthSel.value).padStart(2, '0')}`;
-    const toValue   = `${toYearSel.value}-${String(toMonthSel.value).padStart(2, '0')}`;
-    render(null, fromValue, toValue);
+    closePopover();
+    const fromStr = `${fromValue.year}-${String(fromValue.month).padStart(2, '0')}`;
+    const toStr   = `${toValue.year}-${String(toValue.month).padStart(2, '0')}`;
+    render(null, fromStr, toStr);
   });
 
-  function populateMonthYearSelects() {
-    const monthOptions = MONTH_ABBR
-      .map((name, i) => `<option value="${i + 1}">${name}</option>`)
-      .join('');
+  // ── Popover open/close ──
+  fromBtn.addEventListener('click', () => openPopover('from'));
+  toBtn.addEventListener('click', () => openPopover('to'));
 
-    const currentYear = new Date().getFullYear();
-    const yearOptions = [currentYear - 1, currentYear]
-      .map(y => `<option value="${y}">${y}</option>`)
-      .join('');
+  yearPrevBtn.addEventListener('click', () => {
+    popoverYear -= 1;
+    renderPopoverGrid();
+  });
+  yearNextBtn.addEventListener('click', () => {
+    popoverYear += 1;
+    renderPopoverGrid();
+  });
 
-    [fromMonthSel, toMonthSel].forEach(sel => { sel.innerHTML = monthOptions; });
-    [fromYearSel, toYearSel].forEach(sel => { sel.innerHTML = yearOptions; });
+  function openPopover(field) {
+    activeField = field;
+    const current = field === 'from' ? fromValue : toValue;
+    popoverYear = current.year;
+    fromBtn.classList.toggle('active', field === 'from');
+    toBtn.classList.toggle('active', field === 'to');
+    popover.hidden = false;
+    renderPopoverGrid();
   }
 
-  function setSelectValue(selectEl, value) {
-    selectEl.value = String(value);
+  function closePopover() {
+    activeField = null;
+    popover.hidden = true;
+    fromBtn.classList.remove('active');
+    toBtn.classList.remove('active');
+  }
+
+  // Tapping anywhere outside the popover/trigger buttons closes it —
+  // standard picker behavior, and matters on mobile where there's no
+  // hover state to rely on for "did they move on already".
+  document.addEventListener('click', (e) => {
+    if (popover.hidden) return;
+    if (popover.contains(e.target) || e.target === fromBtn || e.target === toBtn) return;
+    closePopover();
+  });
+
+  function renderPopoverGrid() {
+    popoverYearLabel.textContent = popoverYear;
+
+    if (minYear !== undefined) {
+      yearPrevBtn.disabled = popoverYear <= minYear;
+      yearNextBtn.disabled = popoverYear >= maxYear;
+    }
+
+    const selected = activeField === 'from' ? fromValue : toValue;
+
+    popoverGrid.innerHTML = MONTH_ABBR.map((name, i) => {
+      const monthNum = i + 1;
+      const isSelected = selected.year === popoverYear && selected.month === monthNum;
+      const outOfRange = minYear !== undefined && !isMonthInDataRange(monthNum, popoverYear);
+      return `<button type="button"
+        class="contrib-popover-month-btn${isSelected ? ' selected' : ''}"
+        data-month="${monthNum}" ${outOfRange ? 'disabled' : ''}>${name}</button>`;
+    }).join('');
+
+    popoverGrid.querySelectorAll('.contrib-popover-month-btn:not(:disabled)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const month = parseInt(btn.dataset.month, 10);
+        if (activeField === 'from') {
+          fromValue = { month, year: popoverYear };
+        } else if (activeField === 'to') {
+          toValue = { month, year: popoverYear };
+        }
+        updateTriggerLabels();
+        closePopover();
+      });
+    });
+  }
+
+  function isMonthInDataRange(month, year) {
+    if (!contributions.length) return true;
+    const target = new Date(year, month - 1, 1).getTime();
+    const first = new Date(contributions[0].date);
+    const last = new Date(contributions[contributions.length - 1].date);
+    const firstOfMonth = new Date(first.getFullYear(), first.getMonth(), 1).getTime();
+    const lastOfMonth = new Date(last.getFullYear(), last.getMonth(), 1).getTime();
+    return target >= firstOfMonth && target <= lastOfMonth;
+  }
+
+  function updateTriggerLabels() {
+    fromBtn.textContent = `${MONTH_ABBR[fromValue.month - 1]} ${fromValue.year}`;
+    toBtn.textContent = `${MONTH_ABBR[toValue.month - 1]} ${toValue.year}`;
   }
 
   /**
